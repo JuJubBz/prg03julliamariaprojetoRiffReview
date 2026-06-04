@@ -1,4 +1,4 @@
-package br.com.ifba.main;
+package br.com.ifba;
 
 import java.awt.EventQueue;
 import org.springframework.boot.SpringApplication;
