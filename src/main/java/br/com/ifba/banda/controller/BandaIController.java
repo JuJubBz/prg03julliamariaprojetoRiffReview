@@ -17,5 +17,5 @@ public interface BandaIController  {
     Banda update(Banda banda) throws RuntimeException;
     void delete(Long id) throws RuntimeException;
     //void adicionarAlbum(Long bandaId, Object album) throws RuntimeException; vou add dps 
-    double calcularMediaAvaliacoes(Long bandaId) throws RuntimeException;
+    //double calcularMediaAvaliacoes(Long bandaId) throws RuntimeException;
 }

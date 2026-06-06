@@ -8,6 +8,7 @@ import br.com.ifba.infrastructure.entity.PersistenceEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import java.io.Serializable;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -29,4 +30,5 @@ public class Banda extends PersistenceEntity implements Serializable {
     @Column(name = "Ano", nullable = false)
     private int anoFormacao;
     
+    //private List<AvaliacaoBanda> listaAvaliacoes;
 }
