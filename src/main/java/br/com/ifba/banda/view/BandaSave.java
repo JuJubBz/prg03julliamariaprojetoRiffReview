@@ -4,20 +4,30 @@
  */
 package br.com.ifba.banda.view;
 
+import br.com.ifba.banda.controller.BandaIController;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 /**
  *
  * @author Julia Freitas
  */
+@Component
 public class BandaSave extends javax.swing.JFrame {
     
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(BandaSave.class.getName());
-
+    // TROCAMOS AQUI: Agora usamos o tipo da INTERFACE
+    private final BandaIController bandaController;
+    
     /**
      * Creates new form BandaSave
      */
-    public BandaSave() {
+    @Autowired
+    public BandaSave(BandaIController bandaController) {
+        this.bandaController = bandaController; 
+        // O Spring injeta a implementação automaticamente
         initComponents();
         
+        // Mantém a formatação do spinner sem o ponto
         spnAnoFormacao.setEditor(new javax.swing.JSpinner.NumberEditor(spnAnoFormacao, "#"));
     }
 
@@ -48,6 +58,7 @@ public class BandaSave extends javax.swing.JFrame {
 
         btnCancelar.setBackground(new java.awt.Color(255, 153, 153));
         btnCancelar.setText("CANCELAR");
+        btnCancelar.addActionListener(this::btnCancelarActionPerformed);
 
         jLabel1.setFont(new java.awt.Font("Yu Gothic Light", 1, 18)); // NOI18N
         jLabel1.setText("Nome:");
@@ -128,7 +139,44 @@ public class BandaSave extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarActionPerformed
-        // TODO add your handling code here:
+        try {
+        // 1. Validar se os campos de texto não foram deixados em branco
+        if (txtNome.getText().trim().isEmpty() || txtGeneroPrincipal.getText().trim().isEmpty()) {
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                    "Por favor, preencha o Nome e o Gênero antes de salvar.", 
+                    "Aviso", 
+                    javax.swing.JOptionPane.WARNING_MESSAGE);
+            return; // Interrompe a execução para não salvar dados incompletos
+        }
+
+        // 2. Criar o objeto Banda (Entidade) e preencher com os dados da tela
+        br.com.ifba.banda.entity.Banda novaBanda = new br.com.ifba.banda.entity.Banda();
+        novaBanda.setNome(txtNome.getText().trim());
+        novaBanda.setGeneroPrincipal(txtGeneroPrincipal.getText().trim());
+        
+        // Pegamos o valor numérico direto do JSpinner (sem o ponto de milhar!)
+        int ano = (int) spnAnoFormacao.getValue();
+        novaBanda.setAnoFormacao(ano);
+        
+        // 3. Chamar o Controller usando a Interface injetada pelo Spring
+        this.bandaController.save(novaBanda);
+        
+        // 4. Exibir caixinha de sucesso na tela
+        javax.swing.JOptionPane.showMessageDialog(this, 
+                "Banda '" + novaBanda.getNome() + "' salva com sucesso na nuvem!", 
+                "Sucesso", 
+                javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        
+        // 5. Limpar os campos para permitir o próximo cadastro
+        limparCampos();
+        
+    } catch (Exception e) {
+        // Caso ocorra algum erro de conexão com o Supabase ou erro de banco
+        javax.swing.JOptionPane.showMessageDialog(this, 
+                "Erro ao salvar a banda: " + e.getMessage(), 
+                "Erro no Sistema", 
+                javax.swing.JOptionPane.ERROR_MESSAGE);
+    }
     }//GEN-LAST:event_btnSalvarActionPerformed
 
     private void txtNomeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNomeActionPerformed
@@ -139,15 +187,21 @@ public class BandaSave extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtGeneroPrincipalActionPerformed
 
+    private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
+        this.dispose();
+    }//GEN-LAST:event_btnCancelarActionPerformed
+
+    private void limparCampos() {
+        txtNome.setText("");
+        txtGeneroPrincipal.setText("");
+        spnAnoFormacao.setValue(2026); // Reseta o seletor para o ano atual
+        txtNome.requestFocus();        // Faz o cursor voltar a piscar no campo Nome
+    }
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
+      /* Pega os estilos visuais do Nimbus */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -155,13 +209,13 @@ public class BandaSave extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            // Se der erro no visual, ele só avisa no console sem travar o Maven
+            System.out.println("Erro ao carregar o visual Nimbus: " + ex.getMessage());
         }
-        //</editor-fold>
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new BandaSave().setVisible(true));
+        /* Linha do Swing comentada pois quem gerencia agora é o Spring Boot */
+        // java.awt.EventQueue.invokeLater(() -> new BandaSave().setVisible(true));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

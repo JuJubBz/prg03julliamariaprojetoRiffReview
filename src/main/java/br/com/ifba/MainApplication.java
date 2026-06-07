@@ -1,5 +1,6 @@
 package br.com.ifba;
 
+import br.com.ifba.banda.view.BandaSave;
 import java.awt.EventQueue;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -13,8 +14,11 @@ public class MainApplication {
                 .headless(false)
                 .run(args);
 
-        EventQueue.invokeLater(() -> {
-            // Suas telas do Swing entrarão aqui depois
+     
+            // 2. Pede para o Spring pegar a instância da sua tela que já está com tudo injetado
+        java.awt.EventQueue.invokeLater(() -> {
+            BandaSave telaCadastro = context.getBean(BandaSave.class);
+            telaCadastro.setVisible(true); // Faz a mágica acontecer e abre a tela!
         });
     }
 }
