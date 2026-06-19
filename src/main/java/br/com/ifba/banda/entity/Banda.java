@@ -31,5 +31,8 @@ public class Banda extends PersistenceEntity implements Serializable {
     @Column(name = "Ano", nullable = false)
     private int anoFormacao;
     
+    /*@OneToMany(mappedBy = "banda")
+      private List<Album> albuns */
+    
     //private List<AvaliacaoBanda> listaAvaliacoes;
 }

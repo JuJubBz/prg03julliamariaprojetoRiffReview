@@ -2,16 +2,18 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package br.com.ifba.musica.entity;
+package br.com.ifba.album.entity;
 
-import br.com.ifba.album.entity.Album;
+import br.com.ifba.banda.entity.Banda;
 import br.com.ifba.infrastructure.entity.PersistenceEntity;
+import br.com.ifba.musica.entity.Musica;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import java.io.Serializable;
-//import lombok.AllArgsConstructor;
+import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -25,21 +27,21 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Musica extends PersistenceEntity implements Serializable{
+public class Album extends PersistenceEntity implements Serializable{
     
-    @Column(name = "Titulo", nullable = false)
-    private String titulo;
+    @Column(name = "nome", nullable = false)
+    private String nome;
     
-    @Column(name = "Genero", nullable = false)
-    private String generoPrincipal;
-    
-    @Column(name = "Duração", nullable = false)
-    private String duracao;
+    @Column(name = "ano_lancamento", nullable = false)
+    private int anoLancamento;
     
     @ManyToOne
-    @JoinColumn(name = "Album_Id", nullable = false)
-    private Album album;
+    @JoinColumn(name = "banda_id", nullable = false)
+    private Banda banda;
     
-    //private List<AvaliacaoMusica> avaliacao;
+    @OneToMany(mappedBy = "album")
+    private List<Musica>  musicas;
+    
+    //private List<AvaliacaoAlbum> listaavaliacoes;
     
 }
