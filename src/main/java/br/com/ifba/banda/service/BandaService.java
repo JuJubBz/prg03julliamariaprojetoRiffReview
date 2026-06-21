@@ -26,7 +26,7 @@ public class BandaService implements BandaIService{
         return bandaRepository.findAll();
     }
 
-    // 2. REGRA PARA SALVAR (Com validações do slide)
+    // 2. REGRA PARA SALVAR 
     @Override
     public Banda save(Banda banda) throws RuntimeException {
         // Validação 1: O objeto não pode ser nulo

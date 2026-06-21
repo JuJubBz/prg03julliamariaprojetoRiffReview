@@ -8,11 +8,14 @@ import br.com.ifba.musica.entity.Musica;
 import br.com.ifba.musica.service.MusicaIService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 
 /**
  *
  * @author Julia Freitas
  */
+
+@Controller
 public class MusicaController implements MusicaIController{
     
     @Autowired
@@ -58,9 +61,9 @@ public class MusicaController implements MusicaIController{
         musicaService.calcularMediaNotas(id);
     }*/ //depois eu adciono
 
-    @Override
+   /* @Override
     public void exibirDetalhes(Long id) throws RuntimeException {
         musicaService.exibirDetalhes(id);
-    }
+    }*/
     
 }

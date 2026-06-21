@@ -4,10 +4,26 @@
  */
 package br.com.ifba.musica.service;
 
+import br.com.ifba.musica.entity.Musica;
+import java.util.List;
+
 /**
  *
  * @author Julia Freitas
  */
 public interface MusicaIService {
+    // Métodos CRUD Padrão
+    Musica save(Musica musica) throws RuntimeException;
+    List<Musica> findAll() throws RuntimeException;
+    Musica update(Musica musica) throws RuntimeException;
+    void delete(Long id) throws RuntimeException;
+    Musica findById(Long id) throws RuntimeException;
     
+    // Métodos de Busca Customizados
+    List<Musica> findByTitulo(String titulo) throws RuntimeException;
+    List<Musica> findByGeneroPrincipal(String generoPrincipal) throws RuntimeException;
+    
+    // Métodos de Regras de Negócio
+    //void calcularMediaNotas(Long id) throws RuntimeException;
+    //void exibirDetalhes(Long id) throws RuntimeException;
 }

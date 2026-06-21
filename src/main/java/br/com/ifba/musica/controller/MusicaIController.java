@@ -28,6 +28,6 @@ public interface MusicaIController {
     
     // Métodos de Negócio Específicos 
     //void calcularMediaNotas(Long id) throws RuntimeException; add depois 
-    void exibirDetalhes(Long id) throws RuntimeException;     
+    //void exibirDetalhes(Long id) throws RuntimeException;     
 }
 
