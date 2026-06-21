@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Interface.java to edit this template
  */
-package br.com.ifba.album.controller;
+package br.com.ifba.album.service;
 
 import br.com.ifba.album.entity.Album;
 import br.com.ifba.musica.entity.Musica;
@@ -12,9 +12,8 @@ import java.util.List;
  *
  * @author Julia Freitas
  */
-public interface AlbumIController {
-    
-    // Métodos Padrão 
+public interface AlbumIService {
+    // Métodos CRUD Padrão
     Album save(Album album) throws RuntimeException;
     List<Album> findAll() throws RuntimeException;
     Album update(Album album) throws RuntimeException;
@@ -25,9 +24,8 @@ public interface AlbumIController {
     List<Album> findByNome(String nome) throws RuntimeException;
     List<Album> findByAnoLancamento(int anoLancamento) throws RuntimeException;
     
-    // Métodos de Negócio Específicos (Do Diagrama UML)
+    // Métodos de Negócio do Diagrama UML
     void adicionarMusica(Long albumId, Musica musica) throws RuntimeException;
-    //void calcularMediaNotas(Long id) throws RuntimeException;
-    //void exibirTracklist(Long id) throws RuntimeException;
-    
+   // void calcularMediaNotas(Long id) throws RuntimeException;
+   //void exibirTracklist(Long id) throws RuntimeException;
 }

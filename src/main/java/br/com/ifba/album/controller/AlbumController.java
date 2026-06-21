@@ -4,6 +4,11 @@
  */
 package br.com.ifba.album.controller;
 
+import br.com.ifba.album.entity.Album;
+import br.com.ifba.album.service.AlbumIService;
+import br.com.ifba.musica.entity.Musica;
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -57,7 +62,7 @@ public class AlbumController implements AlbumIController{
         albumService.adicionarMusica(albumId, musica);
     }
 
-    @Override
+    /*@Override
     public void calcularMediaNotas(Long id) throws RuntimeException {
         albumService.calcularMediaNotas(id);
     }
@@ -65,6 +70,6 @@ public class AlbumController implements AlbumIController{
     @Override
     public void exibirTracklist(Long id) throws RuntimeException {
         albumService.exibirTracklist(id);
-    }
+    }*/
     
 }
