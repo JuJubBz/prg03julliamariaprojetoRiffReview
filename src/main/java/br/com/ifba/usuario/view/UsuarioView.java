@@ -4,18 +4,26 @@
  */
 package br.com.ifba.usuario.view;
 
+import br.com.ifba.usuario.controller.UsuarioIController;
+import br.com.ifba.usuario.entity.Usuario;
+import org.springframework.stereotype.Component;
+
 /**
  *
  * @author Julia Freitas
  */
+
+@Component
 public class UsuarioView extends javax.swing.JFrame {
     
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(UsuarioView.class.getName());
-
+   private final UsuarioIController usuarioController;
+   private final UsuarioSave usuarioSave;
     /**
      * Creates new form UsuarioView
      */
-    public UsuarioView() {
+    public UsuarioView(UsuarioIController usuarioController, UsuarioSave usuarioSave) {
+        this.usuarioController = usuarioController;
+        this.usuarioSave = usuarioSave;
         initComponents();
     }
 
@@ -116,7 +124,49 @@ public class UsuarioView extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnEntrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEntrarActionPerformed
-        // TODO add your handling code here:
+        try {
+            String emailDigitado = txtUsuario.getText().trim();
+            // Captura o array de char do JPasswordField e converte para String segura
+            String senhaDigitada = new String(txtSenha.getPassword()).trim();
+
+            // 1. Validação simples de campos vazios
+            if (emailDigitado.isEmpty() || senhaDigitada.isEmpty()) {
+                javax.swing.JOptionPane.showMessageDialog(this, 
+                        "Por favor, insira o usuário (e-mail) e a senha.", 
+                        "Campos Vazios", 
+                        javax.swing.JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            // 2. Busca o usuário cadastrado no banco usando o e-mail coletado
+            Usuario usuarioEncontrado = this.usuarioController.findByEmail(emailDigitado);
+
+            // 3. Validação da regra de negócio: Checar se a senha confere
+            if (usuarioEncontrado.getSenha().equals(senhaDigitada)) {
+                
+                javax.swing.JOptionPane.showMessageDialog(this, 
+                        "Login bem-sucedido! Bem-vindo(a), " + usuarioEncontrado.getNome() + "!", 
+                        "Sucesso", 
+                        javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                
+                // Aqui depois você pode instanciar e dar .setVisible(true) na sua tela principal do sistema!
+                // this.dispose(); 
+                
+            } else {
+                // Se a senha estiver incorreta
+                javax.swing.JOptionPane.showMessageDialog(this, 
+                        "Senha incorreta! Tente novamente.", 
+                        "Acesso Negado", 
+                        javax.swing.JOptionPane.ERROR_MESSAGE);
+            }
+
+        } catch (RuntimeException e) {
+            // Trata o caso do .orElseThrow() do Service caso o e-mail não seja localizado no banco
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                    "Usuário não localizado: " + e.getMessage(), 
+                    "Erro de Autenticação", 
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btnEntrarActionPerformed
 
     private void txtUsuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtUsuarioActionPerformed
@@ -124,7 +174,15 @@ public class UsuarioView extends javax.swing.JFrame {
     }//GEN-LAST:event_txtUsuarioActionPerformed
 
     private void btnCadastrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCadastrarActionPerformed
-        // TODO add your handling code here:
+        if (usuarioSave != null) {
+            usuarioSave.setLocationRelativeTo(this); // Centraliza em relação à tela de login
+            usuarioSave.setVisible(true);
+        } else {
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                    "Erro ao carregar a tela de cadastro.", 
+                    "Erro", 
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btnCadastrarActionPerformed
 
     private void txtSenhaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSenhaActionPerformed
@@ -135,11 +193,6 @@ public class UsuarioView extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -147,13 +200,9 @@ public class UsuarioView extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            System.out.println("Erro ao carregar o visual Nimbus: " + ex.getMessage());
         }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new UsuarioView().setVisible(true));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -1,6 +1,7 @@
 package br.com.ifba;
 
-import br.com.ifba.banda.view.BandaSave;
+//import br.com.ifba.banda.view.BandaSave;
+import br.com.ifba.usuario.view.UsuarioView;
 import java.awt.EventQueue;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -17,8 +18,11 @@ public class MainApplication {
      
             // 2. Pede para o Spring pegar a instância da sua tela que já está com tudo injetado
         java.awt.EventQueue.invokeLater(() -> {
-            BandaSave telaCadastro = context.getBean(BandaSave.class);
-            telaCadastro.setVisible(true); // Faz a mágica acontecer e abre a tela!
+           UsuarioView telaLogin = context.getBean(UsuarioView.class);
+            
+            telaLogin.setLocationRelativeTo(null); 
+            
+            telaLogin.setVisible(true);
         });
     }
 }

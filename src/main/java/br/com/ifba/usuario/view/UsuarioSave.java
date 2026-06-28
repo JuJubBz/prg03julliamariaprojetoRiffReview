@@ -4,18 +4,26 @@
  */
 package br.com.ifba.usuario.view;
 
+import br.com.ifba.usuario.controller.UsuarioIController;
+import br.com.ifba.usuario.entity.Usuario;
+import org.springframework.stereotype.Component;
+
 /**
  *
  * @author Julia Freitas
  */
+
+@Component
 public class UsuarioSave extends javax.swing.JFrame {
     
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(UsuarioSave.class.getName());
+    private final UsuarioIController usuarioController;
 
     /**
      * Creates new form UsuarioSave
      */
-    public UsuarioSave() {
+    
+    public UsuarioSave(UsuarioIController usuarioController) {
+        this.usuarioController = usuarioController;
         initComponents();
     }
 
@@ -102,22 +110,59 @@ public class UsuarioSave extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnRealizarCadastroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRealizarCadastroActionPerformed
-        // TODO add your handling code here:
+        try {
+            // 1. Validar se os campos não foram deixados em branco
+            if (txtCadastroLogin.getText().trim().isEmpty() || txtCadastroSenha.getText().trim().isEmpty()) {
+                javax.swing.JOptionPane.showMessageDialog(this, 
+                        "Por favor, preencha todos os campos obrigatórios.", 
+                        "Aviso", 
+                        javax.swing.JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            Usuario novoUsuario = new Usuario();
+            
+            // Para simplificar o fluxo de login inicial do sistema, 
+            // estamos salvando o e-mail coletado no campo tanto no atributo Nome quanto no Email
+            String credencial = txtCadastroLogin.getText().trim();
+            novoUsuario.setNome(credencial);
+            novoUsuario.setEmail(credencial);
+            novoUsuario.setSenha(txtCadastroSenha.getText().trim()); // Captura a senha informada
+
+            // 3. Persistir os dados acionando a interface Controller
+            this.usuarioController.save(novoUsuario);
+
+            // 4. Caixa informativa de sucesso
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                    "Usuário cadastrado com sucesso!", 
+                    "Sucesso", 
+                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
+
+            // 5. Resetar formulário
+            limparCampos();
+
+        } catch (Exception e) {
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                    "Erro ao cadastrar usuário: " + e.getMessage(), 
+                    "Erro no Sistema", 
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btnRealizarCadastroActionPerformed
 
     private void btnVoltarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVoltarActionPerformed
-        // TODO add your handling code here:
+        this.dispose();
     }//GEN-LAST:event_btnVoltarActionPerformed
 
+    private void limparCampos() {
+        txtCadastroLogin.setText("");
+        txtCadastroSenha.setText("");
+        txtCadastroLogin.requestFocus();
+    }
+    
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -125,13 +170,9 @@ public class UsuarioSave extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            System.out.println("Erro ao carregar o visual Nimbus: " + ex.getMessage());
         }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new UsuarioSave().setVisible(true));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
