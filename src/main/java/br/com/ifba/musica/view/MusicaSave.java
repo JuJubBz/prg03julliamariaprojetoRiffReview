@@ -5,20 +5,26 @@
 package br.com.ifba.musica.view;
 
 import br.com.ifba.album.view.*;
+import br.com.ifba.musica.controller.MusicaIController;
+import br.com.ifba.musica.entity.Musica;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author Julia Freitas
  */
+@Component
 public class MusicaSave extends javax.swing.JFrame {
     
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(MusicaSave.class.getName());
-
+    private final MusicaIController musicaController;
     /**
      * Creates new form AlbumSave
      */
-    public MusicaSave() {
+    public MusicaSave(MusicaIController musicaController) {
+        this.musicaController = musicaController; 
         initComponents();
+        
+        spnDuracao.setEditor(new javax.swing.JSpinner.NumberEditor(spnDuracao, "#"));
     }
 
     /**
@@ -120,22 +126,60 @@ public class MusicaSave extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnSalvarMusicaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarMusicaActionPerformed
-        // TODO add your handling code here:
+       try {
+            // 1. Validar se os campos obrigatórios não foram deixados em branco
+            if (txtNome.getText().trim().isEmpty() || txtGenero.getText().trim().isEmpty()) {
+                javax.swing.JOptionPane.showMessageDialog(this, 
+                        "Por favor, preencha o Nome e o Gênero antes de salvar.", 
+                        "Aviso", 
+                        javax.swing.JOptionPane.WARNING_MESSAGE);
+                return; // Corta o fluxo se os campos não estiverem preenchidos
+            }
+
+            // 2. Instanciar a entidade Música e preencher com o que está na tela
+            Musica novaMusica = new Musica();
+            novaMusica.setTitulo(txtNome.getText().trim());
+            novaMusica.setGeneroPrincipal(txtGenero.getText().trim());
+            
+            // Pega o valor inteiro correspondente aos segundos/minutos do JSpinner
+            String duracaoStr = String.valueOf(spnDuracao.getValue());
+            novaMusica.setDuracao(duracaoStr);
+            
+            // 3. Persistir os dados utilizando a camada do Controller injetada
+            this.musicaController.save(novaMusica);
+            
+            // 4. Alertar o usuário sobre a gravação com sucesso
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                    "Música '" + novaMusica.getTitulo() + "' salva com sucesso na nuvem!", 
+                    "Sucesso", 
+                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
+            
+            // 5. Resetar o formulário para entradas subsequentes
+            limparCampos();
+            
+        } catch (Exception e) {
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                    "Erro ao salvar a música: " + e.getMessage(), 
+                    "Erro no Sistema", 
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btnSalvarMusicaActionPerformed
 
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
-        // TODO add your handling code here:
+        this.dispose();
     }//GEN-LAST:event_btnCancelarActionPerformed
 
+    private void limparCampos() {
+        txtNome.setText("");
+        txtGenero.setText("");
+        spnDuracao.setValue(0);  
+        txtNome.requestFocus();  
+    }
+    
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -143,13 +187,12 @@ public class MusicaSave extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            System.out.println("Erro ao carregar o visual Nimbus: " + ex.getMessage());
         }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new MusicaSave().setVisible(true));
+        
+        /* O gerenciamento do ciclo de vida das views agora é gerido exclusivamente pelo Spring Containers */
+        // java.awt.EventQueue.invokeLater(() -> new MusicaSave().setVisible(true));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
