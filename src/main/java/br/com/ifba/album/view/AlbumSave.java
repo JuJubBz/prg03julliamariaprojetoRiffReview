@@ -4,21 +4,71 @@
  */
 package br.com.ifba.album.view;
 
+import br.com.ifba.album.controller.AlbumIController;
+import br.com.ifba.album.entity.Album;
+import br.com.ifba.banda.controller.BandaIController;
+import br.com.ifba.banda.entity.Banda;
+import br.com.ifba.musica.controller.MusicaIController;
+import br.com.ifba.musica.entity.Musica;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.table.DefaultTableModel;
+import org.springframework.stereotype.Component;
+
 /**
  *
  * @author Julia Freitas
  */
+@Component
 public class AlbumSave extends javax.swing.JFrame {
     
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(AlbumSave.class.getName());
-
+    private final AlbumIController albumController;
+    private final BandaIController bandaController;
+    private final MusicaIController musicaController;
+    
+    private List<Musica> musicasSelecionadas = new ArrayList<>();
+    private DefaultTableModel tableModel;
     /**
      * Creates new form AlbumSave
      */
-    public AlbumSave() {
+    public AlbumSave(AlbumIController albumController, BandaIController bandaController, MusicaIController musicaController) {
+        this.albumController = albumController;
+        this.bandaController = bandaController;
+        this.musicaController = musicaController;
+        
         initComponents();
+        
+        // Pega o modelo padrão da tabela criada no Design
+        this.tableModel = (DefaultTableModel) tblMusicas.getModel();
+        
+        // Mantém a formatação do spinner do Ano limpa (sem o ponto de milhar)
+        spinAno.setEditor(new javax.swing.JSpinner.NumberEditor(spinAno, "#"));
+        
+        // Carrega as bandas cadastradas no ComboBox logo ao abrir a tela
+        carregarBandas();
     }
 
+    
+    private void carregarBandas() {
+        try {
+            comboBanda.removeAllItems();
+            List<Banda> bandas = bandaController.findAll();
+            for (Banda b : bandas) {
+                comboBanda.addItem(b); // Adiciona o objeto completo. Garanta que a entidade Banda tenha um bom toString()
+            }
+        } catch (Exception e) {
+            System.out.println("Erro ao carregar as bandas no ComboBox: " + e.getMessage());
+        }
+    }
+
+    // Método auxiliar para redesenhar a tabela sempre que a lista mudar
+    private void atualizarTabelaMusicas() {
+        tableModel.setRowCount(0); // Limpa as linhas atuais
+        for (Musica m : musicasSelecionadas) {
+            tableModel.addRow(new Object[]{m.getId(), m.getTitulo()});
+        }
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -28,111 +78,260 @@ public class AlbumSave extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        btnRemoverMusica = new javax.swing.JButton();
+        btnAdcionarMusica = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
+        txtTitulo = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
-        jComboBox1 = new javax.swing.JComboBox<>();
+        comboBanda = new javax.swing.JComboBox();
         jLabel6 = new javax.swing.JLabel();
-        jSpinner1 = new javax.swing.JSpinner();
+        spinAno = new javax.swing.JSpinner();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tblMusicas = new javax.swing.JTable();
+        btnCancelar = new javax.swing.JButton();
+        btnSalvarAlbum = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jButton1.setText("SALVAR");
-        jButton1.addActionListener(this::jButton1ActionPerformed);
+        btnRemoverMusica.setBackground(new java.awt.Color(255, 153, 153));
+        btnRemoverMusica.setText("REMOVER MUSICA");
+        btnRemoverMusica.addActionListener(this::btnRemoverMusicaActionPerformed);
 
-        jButton2.setText("CANCELAR");
-        jButton2.addActionListener(this::jButton2ActionPerformed);
+        btnAdcionarMusica.setBackground(new java.awt.Color(153, 255, 153));
+        btnAdcionarMusica.setText("ADCIONAR MUSICA");
+        btnAdcionarMusica.addActionListener(this::btnAdcionarMusicaActionPerformed);
 
         jLabel1.setFont(new java.awt.Font("Yu Gothic UI", 1, 24)); // NOI18N
         jLabel1.setText("ADICIONAR ALBUM");
 
         jLabel4.setFont(new java.awt.Font("Yu Gothic UI", 0, 18)); // NOI18N
-        jLabel4.setText("Nome:");
+        jLabel4.setText("Título:");
 
         jLabel5.setFont(new java.awt.Font("Yu Gothic UI", 0, 18)); // NOI18N
         jLabel5.setText("Banda:");
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        comboBanda.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         jLabel6.setFont(new java.awt.Font("Yu Gothic UI", 0, 18)); // NOI18N
         jLabel6.setText("Ano: ");
+
+        tblMusicas.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null},
+                {null, null},
+                {null, null},
+                {null, null}
+            },
+            new String [] {
+                "ID", "NOME"
+            }
+        ));
+        jScrollPane1.setViewportView(tblMusicas);
+
+        btnCancelar.setBackground(new java.awt.Color(255, 153, 153));
+        btnCancelar.setText("CANCELAR");
+        btnCancelar.addActionListener(this::btnCancelarActionPerformed);
+
+        btnSalvarAlbum.setBackground(new java.awt.Color(153, 255, 153));
+        btnSalvarAlbum.setText("SALVAR");
+        btnSalvarAlbum.addActionListener(this::btnSalvarAlbumActionPerformed);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(130, 130, 130)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel5)
-                            .addComponent(jLabel6)
-                            .addComponent(jLabel4))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnAdcionarMusica, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addGap(103, 103, 103)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(jComboBox1, 0, 166, Short.MAX_VALUE)
-                                .addComponent(jTextField1))
-                            .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(176, 176, 176)
-                        .addComponent(jLabel1)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(btnRemoverMusica, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 582, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(142, Short.MAX_VALUE))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(283, 283, 283)
+                .addComponent(jLabel1)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(160, Short.MAX_VALUE)
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(81, 81, 81)
-                .addComponent(jButton2)
-                .addGap(165, 165, 165))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(100, 100, 100)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel6)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(spinAno, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(jLabel5)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(comboBanda, javax.swing.GroupLayout.PREFERRED_SIZE, 166, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(jLabel4)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(txtTitulo, javax.swing.GroupLayout.PREFERRED_SIZE, 166, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(92, 92, 92)
+                        .addComponent(btnCancelar, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnSalvarAlbum)))
+                .addGap(119, 119, 119))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(44, 44, 44)
+                .addGap(37, 37, 37)
                 .addComponent(jLabel1)
-                .addGap(42, 42, 42)
+                .addGap(53, 53, 53)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(51, 51, 51)
+                    .addComponent(txtTitulo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(34, 34, 34)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(51, 51, 51)
+                    .addComponent(comboBanda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(48, 48, 48)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel6))
-                .addGap(42, 42, 42)
+                    .addComponent(jLabel6)
+                    .addComponent(spinAno, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 36, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton2)
-                    .addComponent(jButton1))
-                .addContainerGap(23, Short.MAX_VALUE))
+                    .addComponent(btnRemoverMusica)
+                    .addComponent(btnAdcionarMusica))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 229, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(32, 32, 32)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnSalvarAlbum)
+                    .addComponent(btnCancelar))
+                .addGap(27, 27, 27))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton2ActionPerformed
+    private void btnAdcionarMusicaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAdcionarMusicaActionPerformed
+        try {
+            // 1. Busca todas as músicas existentes cadastradas no sistema
+            List<Musica> todasAsMusicas = musicaController.findAll();
+            
+            if (todasAsMusicas.isEmpty()) {
+                javax.swing.JOptionPane.showMessageDialog(this, "Nenhuma música cadastrada no sistema para vincular.");
+                return;
+            }
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
+            // 2. Prepara o array com os nomes para exibir no seletor
+            String[] opcoes = new String[todasAsMusicas.size()];
+            for (int i = 0; i < todasAsMusicas.size(); i++) {
+                opcoes[i] = todasAsMusicas.get(i).getTitulo();
+            }
 
+            // 3. Abre uma caixinha de diálogo para escolha rápida
+            String escolha = (String) javax.swing.JOptionPane.showInputDialog(
+                    this, 
+                    "Selecione a música para adicionar ao álbum:", 
+                    "Adicionar Música Existente", 
+                    javax.swing.JOptionPane.QUESTION_MESSAGE, 
+                    null, 
+                    opcoes, 
+                    opcoes[0]
+            );
+
+            // 4. Procura o objeto correspondente e o adiciona se não for repetido
+            if (escolha != null) {
+                for (Musica m : todasAsMusicas) {
+                    if (m.getTitulo().equals(escolha)) {
+                        if (!musicasSelecionadas.contains(m)) {
+                            musicasSelecionadas.add(m);
+                            atualizarTabelaMusicas();
+                        } else {
+                            javax.swing.JOptionPane.showMessageDialog(this, "Esta música já foi adicionada ao álbum atual!");
+                        }
+                        break;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Erro ao buscar músicas: " + e.getMessage());
+        }
+    }//GEN-LAST:event_btnAdcionarMusicaActionPerformed
+
+    private void btnRemoverMusicaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoverMusicaActionPerformed
+        int linhaSelecionada = tblMusicas.getSelectedRow();
+        
+        if (linhaSelecionada == -1) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Selecione uma música da tabela para removê-la.");
+            return;
+        }
+        
+        // Remove da lista pelo mesmo índice da tabela e renderiza novamente
+        musicasSelecionadas.remove(linhaSelecionada);
+        atualizarTabelaMusicas();
+    }//GEN-LAST:event_btnRemoverMusicaActionPerformed
+
+    private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
+        this.dispose();
+    }//GEN-LAST:event_btnCancelarActionPerformed
+
+    private void btnSalvarAlbumActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarAlbumActionPerformed
+        try {
+            // 1. Validação básica de campos textuais
+            if (txtTitulo.getText().trim().isEmpty() || comboBanda.getSelectedItem() == null) {
+                javax.swing.JOptionPane.showMessageDialog(this, 
+                        "Por favor, preencha o Título do Álbum e selecione uma Banda.", 
+                        "Aviso", 
+                        javax.swing.JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            // 2. Instancia a Entidade Álbum
+            Album novoAlbum = new Album();
+            novoAlbum.setNome(txtTitulo.getText().trim());
+            novoAlbum.setAnoLancamento((int) spinAno.getValue());
+            novoAlbum.setBanda((Banda) comboBanda.getSelectedItem());
+            
+            // 3. Passa a lista temporária de músicas selecionadas para o Álbum
+            novoAlbum.setMusicas(musicasSelecionadas);
+            
+            // 4. Atualiza o mapeamento bidirecional da JPA: diz para cada música quem é o álbum dela
+            for (Musica m : musicasSelecionadas) {
+                m.setAlbum(novoAlbum);
+            }
+            
+            // 5. Salva o pacote completo no banco (Cascata tratará o resto se mapeado)
+            this.albumController.save(novoAlbum);
+            
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                    "Álbum '" + novoAlbum.getNome() + "' e suas faixas salvos com sucesso!", 
+                    "Sucesso", 
+                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
+            
+            limparCampos();
+            
+        } catch (Exception e) {
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                    "Erro ao salvar o álbum: " + e.getMessage(), 
+                    "Erro no Sistema", 
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_btnSalvarAlbumActionPerformed
+
+    private void limparCampos() {
+        txtTitulo.setText("");
+        spinAno.setValue(2026); // Reseta para o ano padrão
+        if (comboBanda.getItemCount() > 0) comboBanda.setSelectedIndex(0);
+        musicasSelecionadas.clear();
+        atualizarTabelaMusicas();
+        txtTitulo.requestFocus();
+    }
+    
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -140,24 +339,24 @@ public class AlbumSave extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            System.out.println("Erro ao carregar o visual Nimbus: " + ex.getMessage());
         }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new AlbumSave().setVisible(true));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JComboBox<String> jComboBox1;
+    private javax.swing.JButton btnAdcionarMusica;
+    private javax.swing.JButton btnCancelar;
+    private javax.swing.JButton btnRemoverMusica;
+    private javax.swing.JButton btnSalvarAlbum;
+    private javax.swing.JComboBox comboBanda;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JSpinner jSpinner1;
-    private javax.swing.JTextField jTextField1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JSpinner spinAno;
+    private javax.swing.JTable tblMusicas;
+    private javax.swing.JTextField txtTitulo;
     // End of variables declaration//GEN-END:variables
 }
