@@ -5,13 +5,17 @@
 package br.com.ifba.avaliacao.controller;
 
 import br.com.ifba.avaliacao.entity.Avaliacao;
+import br.com.ifba.avaliacao.service.AvaliacaoIService;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 
 /**
  *
  * @author Julia Freitas
  */
+@Controller
 public class AvaliacaoController <T extends Avaliacao> implements AvaliacaoIController<T>{
     
     @Autowired
@@ -39,11 +43,20 @@ public class AvaliacaoController <T extends Avaliacao> implements AvaliacaoICont
     }
 
     @Override
-    public void exibirReview(Long id) throws RuntimeException {
-        T avaliacao = avaliacaoService.findById(id); 
-        if (avaliacao != null) {
-            avaliacao.exibirReview(); 
-        }
+    public String exibirReview(Long id) throws RuntimeException {
+    // service para a logica do txt
+    return avaliacaoService.exibirReview(id);
+    }
+    
+    @Override
+    public List<T> findByUsuarioNome(String nome) throws RuntimeException {
+        // direto para a regra de negócio do Service
+        return avaliacaoService.findByUsuarioNome(nome);
+    }
+
+    @Override
+    public List<T> findByDataCriacao(LocalDateTime data) throws RuntimeException {
+        return avaliacaoService.findByDataCriacao(data);
     }
     
 }
