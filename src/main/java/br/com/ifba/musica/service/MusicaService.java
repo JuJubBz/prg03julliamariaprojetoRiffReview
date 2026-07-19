@@ -107,30 +107,29 @@ public class MusicaService implements MusicaIService{
         return musicaRepository.findByGeneroPrincipalContaining(generoPrincipal);
     }
 
-    // --- MÉTODOS DE NEGÓCIO ---
-
-   /* @Override
-    public void calcularMediaNotas(Long id) throws RuntimeException {
-        Musica musica = this.findById(id);
-        
-        // TODO: Quando você implementar a classe 'AvaliacaoMusica', coloque a lógica de média aqui,
-        // parecido com o que você rascunhou na classe Banda!
-        System.out.println("Calculando média de notas para a música: " + musica.getTitulo());
-    }
-
     @Override
-    public void exibirDetalhes(Long id) throws RuntimeException {
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    //Esse metodo é so de leitura. Como o one to many é lazy, a sessao permanece aberta pra leitura do metodo direito (foi isso que entendi)
+    public double calcularMediaNotas(Long id) throws RuntimeException {
         Musica musica = this.findById(id);
         
-        // Exemplo simples de implementação do método de visualização do UML
-        System.out.println("=== Detalhes da Música ===");
-        System.out.println("Título: " + musica.getTitulo());
-        System.out.println("Gênero: " + musica.getGeneroPrincipal());
-        System.out.println("Duração: " + musica.getDuracao());
-        if (musica.getAlbum() != null) {
-            System.out.println("Álbum: " + musica.getAlbum().getNome());
+        if (musica.getListaAvaliacoes() == null || musica.getListaAvaliacoes().isEmpty()) {
+            return 0.0;
         }
+        
+        double soma = 0;
+        for (br.com.ifba.avaliacao.entity.AvaliacaoMusica avaliacao : musica.getListaAvaliacoes()) {
+            soma += avaliacao.getNota(); 
+        }
+        
+        return soma / musica.getListaAvaliacoes().size();
     }
-}*/
+
+    /*@Override
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public Musica exibirDetalhes(Long id) throws RuntimeException {
+        // Retorna a música com todos os seus atributos preenchidos
+        return this.findById(id);
+    }*/
     
 }

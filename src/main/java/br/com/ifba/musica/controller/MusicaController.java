@@ -56,14 +56,16 @@ public class MusicaController implements MusicaIController{
         return musicaService.findByGeneroPrincipal(generoPrincipal);
     }
 
-    /*@Override
-    public void calcularMediaNotas(Long id) throws RuntimeException {
-        musicaService.calcularMediaNotas(id);
-    }*/ //depois eu adciono
+    @Override
+    public double calcularMediaNotas(Long id) throws RuntimeException {
+        return musicaService.calcularMediaNotas(id);
+    }
 
-   /* @Override
-    public void exibirDetalhes(Long id) throws RuntimeException {
-        musicaService.exibirDetalhes(id);
+    /*@Override
+    public Musica exibirDetalhes(Long id) throws RuntimeException {
+        return musicaService.exibirDetalhes(id);
     }*/
     
 }
+    
+

@@ -5,12 +5,15 @@
 package br.com.ifba.musica.entity;
 
 import br.com.ifba.album.entity.Album;
+import br.com.ifba.avaliacao.entity.AvaliacaoMusica;
 import br.com.ifba.infrastructure.entity.PersistenceEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import java.io.Serializable;
+import java.util.List;
 //import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -40,6 +43,8 @@ public class Musica extends PersistenceEntity implements Serializable{
     @JoinColumn(name = "Album_Id", nullable = false)
     private Album album;
     
-    //private List<AvaliacaoMusica> avaliacao;
+    @OneToMany(mappedBy = "musicaAvaliada", cascade = jakarta.persistence.CascadeType.ALL, fetch = jakarta.persistence.FetchType.LAZY)
+    //Só busca na lista quando alguém Realmente precisar. "Lazy", faz sentido.
+    private List<AvaliacaoMusica> listaAvaliacoes;
     
 }

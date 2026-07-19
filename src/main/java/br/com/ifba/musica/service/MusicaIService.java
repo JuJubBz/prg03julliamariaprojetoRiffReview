@@ -24,6 +24,6 @@ public interface MusicaIService {
     List<Musica> findByGeneroPrincipal(String generoPrincipal) throws RuntimeException;
     
     // Métodos de Regras de Negócio
-    //void calcularMediaNotas(Long id) throws RuntimeException;
-    //void exibirDetalhes(Long id) throws RuntimeException;
+    double calcularMediaNotas(Long id) throws RuntimeException;
+    //Musica exibirDetalhes(Long id) throws RuntimeException;
 }

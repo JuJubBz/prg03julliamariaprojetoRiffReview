@@ -27,7 +27,7 @@ public interface MusicaIController {
     List<Musica> findByGeneroPrincipal(String generoPrincipal) throws RuntimeException;
     
     // Métodos de Negócio Específicos 
-    //void calcularMediaNotas(Long id) throws RuntimeException; add depois 
-    //void exibirDetalhes(Long id) throws RuntimeException;     
+    double calcularMediaNotas(Long id) throws RuntimeException; 
+    //Musica exibirDetalhes(Long id) throws RuntimeException; --> Método Rendundante.    
 }
 
