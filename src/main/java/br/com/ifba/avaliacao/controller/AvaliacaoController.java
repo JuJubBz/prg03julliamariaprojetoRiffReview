@@ -28,7 +28,7 @@ public class AvaliacaoController <T extends Avaliacao> implements AvaliacaoICont
 
     @Override
     public T save(T avaliacao) throws RuntimeException {
-        // Aqui vai a nota, o comentário, o usuário e tudo mais que você setou na View!
+        // Aqui vai a nota, o comentário, o usuário e tudo mais
         return avaliacaoService.save(avaliacao);
     }
 

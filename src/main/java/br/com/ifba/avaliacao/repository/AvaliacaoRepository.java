@@ -4,10 +4,22 @@
  */
 package br.com.ifba.avaliacao.repository;
 
+import br.com.ifba.avaliacao.entity.Avaliacao;
+import java.time.LocalDateTime;
+import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
 /**
  *
  * @author Julia Freitas
  */
-public interface AvaliacaoRepository {
+@Repository
+public interface AvaliacaoRepository<T extends Avaliacao> extends JpaRepository<T, Long> {
     
+    // busca por parte do nome ignorando maiúsculas/minúsculas
+    List<T> findByUsuarioNomeContainingIgnoreCase(String nome);
+    
+    //listar as avaliações criadas em uma data específica
+    List<T> findByDataCriacao(LocalDateTime dataCriacao);
 }

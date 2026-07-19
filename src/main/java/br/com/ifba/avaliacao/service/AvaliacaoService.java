@@ -5,9 +5,11 @@
 package br.com.ifba.avaliacao.service;
 
 import br.com.ifba.avaliacao.entity.Avaliacao;
+import br.com.ifba.avaliacao.repository.AvaliacaoRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  *
@@ -20,13 +22,11 @@ public class AvaliacaoService<T extends Avaliacao> implements AvaliacaoIService<
     @Autowired
     private AvaliacaoRepository<T> avaliacaoRepository;
 
-    // 1. REGRA PARA BUSCAR TODOS
     @Override
     public List<T> findAll() throws RuntimeException {
         return avaliacaoRepository.findAll();
     }
 
-    // 2. REGRA PARA BUSCAR POR ID (Necessário para o exibirReview do controller)
     @Override
     public T findById(Long id) throws RuntimeException {
         if (id == null) {
@@ -36,7 +36,6 @@ public class AvaliacaoService<T extends Avaliacao> implements AvaliacaoIService<
                 .orElseThrow(() -> new RuntimeException("Avaliação não encontrada!"));
     }
 
-    // 3. REGRA PARA SALVAR com validações baseadas na classe pai
     @Override
     public T save(T avaliacao) throws RuntimeException {
         // Validação 1: O objeto não pode ser nulo
@@ -62,7 +61,7 @@ public class AvaliacaoService<T extends Avaliacao> implements AvaliacaoIService<
         return avaliacaoRepository.save(avaliacao);
     }
 
-    // 4. REGRA PARA ATUALIZAR
+    
     @Override
     public T update(T avaliacao) throws RuntimeException {
         if (avaliacao == null) {
@@ -77,7 +76,6 @@ public class AvaliacaoService<T extends Avaliacao> implements AvaliacaoIService<
         return avaliacaoRepository.save(avaliacao);
     }
 
-    // 5. REGRA PARA DELETAR
     @Override
     public void delete(Long id) throws RuntimeException {
         if (id == null) {
@@ -101,7 +99,6 @@ public class AvaliacaoService<T extends Avaliacao> implements AvaliacaoIService<
     return avaliacaoRepository.findByUsuarioNomeContainingIgnoreCase(nome);
 }
 
-    // 7. BUSCA POR DATA
     @Override
     public List<T> findByDataCriacao(LocalDateTime data) throws RuntimeException {
         if (data == null) {
@@ -111,7 +108,7 @@ public class AvaliacaoService<T extends Avaliacao> implements AvaliacaoIService<
     }
     
     @Override
-public String exibirReview(Long id) throws RuntimeException {
+    public String exibirReview(Long id) throws RuntimeException {
     // 1. Busca a avaliação no banco pelo ID
     T avaliacao = findById(id);
     
@@ -119,7 +116,7 @@ public String exibirReview(Long id) throws RuntimeException {
         throw new RuntimeException("Avaliação não encontrada para exibir!");
     }
 
-    // 2. Monta o texto usando os atributos que estão na classe pai (Avaliacao)
+    // Monta o texto usando os atributos que estão na classe pai (Avaliacao)
     String reviewFormatada = "Usuário: " + avaliacao.getUsuario().getNome() + "\n"
             + "Nota: " + avaliacao.getNota() + "\n"
             + "Comentário: " + avaliacao.getComentario() + "\n"
