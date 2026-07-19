@@ -4,9 +4,12 @@
  */
 package br.com.ifba.banda.entity;
 
+import br.com.ifba.album.entity.Album;
+import br.com.ifba.avaliacao.entity.AvaliacaoBanda;
 import br.com.ifba.infrastructure.entity.PersistenceEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
 import java.io.Serializable;
 import java.util.List;
 import lombok.Getter;
@@ -31,8 +34,9 @@ public class Banda extends PersistenceEntity implements Serializable {
     @Column(name = "Ano", nullable = false)
     private int anoFormacao;
     
-    /*@OneToMany(mappedBy = "banda")
-      private List<Album> albuns */
+    @OneToMany(mappedBy = "banda")
+    private List<Album> albuns;
     
-    //private List<AvaliacaoBanda> listaAvaliacoes;
+    @OneToMany(mappedBy = "bandaAvaliada", cascade = jakarta.persistence.CascadeType.ALL, fetch = jakarta.persistence.FetchType.LAZY)
+    private List<AvaliacaoBanda> listaAvaliacoes;
 }

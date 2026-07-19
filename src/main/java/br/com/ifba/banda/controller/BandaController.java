@@ -40,9 +40,9 @@ public class BandaController implements BandaIController{
         bandaService.delete(id);
     }
     
-    /*@Override
+    @Override
     public double calcularMediaAvaliacoes(Long bandaId) throws RuntimeException {
         return bandaService.calcularMediaAvaliacoes(bandaId);
-    }*/
+    }
     
 }

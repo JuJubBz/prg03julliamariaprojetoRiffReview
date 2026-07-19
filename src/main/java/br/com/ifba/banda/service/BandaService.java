@@ -76,8 +76,8 @@ public class BandaService implements BandaIService{
         bandaRepository.deleteById(id);
     }
 
-    // 5. REGRA DE NEGÓCIO: CALCULAR MÉDIA DE AVALIAÇÕES
-    /*@Override
+    @Override
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public double calcularMediaAvaliacoes(Long bandaId) throws RuntimeException {
         // 1. Busca a banda para garantir que ela existe
         Banda banda = bandaRepository.findById(bandaId)
@@ -88,13 +88,13 @@ public class BandaService implements BandaIService{
             return 0.0;
         }
 
-        // 3. Percorre a lista somando as notas (supondo que a classe avaliacaoBanda tenha o método getNota())
+        // 3. Percorre a lista somando as notas
         double soma = 0.0;
-        for (var avaliacao : banda.getListaAvaliacoes()) {
-            soma += avaliacao.getNota(); // Substitua 'getNota()' pelo nome real do método na sua classe avaliacaoBanda
+        for (br.com.ifba.avaliacao.entity.AvaliacaoBanda avaliacao : banda.getListaAvaliacoes()) {
+            soma += avaliacao.getNota(); 
         }
 
         // 4. Retorna a média aritmética simples
         return soma / banda.getListaAvaliacoes().size();
-    }*/
+    }
 }
