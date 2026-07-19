@@ -27,7 +27,7 @@ public interface AlbumIController {
     
     // Métodos de Negócio Específicos (Do Diagrama UML)
     void adicionarMusica(Long albumId, Musica musica) throws RuntimeException;
-    //void calcularMediaNotas(Long id) throws RuntimeException;
-    //void exibirTracklist(Long id) throws RuntimeException;
+    double calcularMediaNotas(Long id) throws RuntimeException;
+    List<Musica> exibirTracklist(Long id) throws RuntimeException;
     
 }

@@ -125,26 +125,37 @@ public class AlbumService implements AlbumIService{
         System.out.println("Música '" + musica.getTitulo() + "' adicionada com sucesso ao álbum: " + album.getNome());
     }
 
-    /*@Override
-    public void calcularMediaNotas(Long id) throws RuntimeException {
+    @Override
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public double calcularMediaNotas(Long id) throws RuntimeException {
         Album album = this.findById(id);
         
-        // Estrutura pronta para quando a classe AvaliacaoAlbum for implementada
-        System.out.println("Calculando a média das avaliações do álbum: " + album.getNome());
+        // Se o álbum não tiver nenhuma avaliação cadastrada ainda, retorna média 0.0
+        if (album.getListaAvaliacoes() == null || album.getListaAvaliacoes().isEmpty()) {
+            return 0.0;
+        }
+        
+        // Soma todas as notas da lista de AvaliacaoAlbum
+        double soma = 0;
+        for (br.com.ifba.avaliacao.entity.AvaliacaoAlbum avaliacao : album.getListaAvaliacoes()) {
+            soma += avaliacao.getNota(); // Supondo que o atributo na classe Avaliacao seja 'nota'
+        }
+        
+        // Retorna o cálculo da média
+        return soma / album.getListaAvaliacoes().size();
     }
 
     @Override
-    public void exibirTracklist(Long id) throws RuntimeException {
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public List<Musica> exibirTracklist(Long id) throws RuntimeException {
         Album album = this.findById(id);
         
-        System.out.println("=== Tracklist do álbum: " + album.getNome() + " ===");
-        if (album.getMusicas() == null || album.getMusicas().isEmpty()) {
-            System.out.println("Nenhuma música cadastrada neste álbum.");
-        } else {
-            for (Musica musica : album.getMusicas()) {
-                System.out.println("- " + musica.getTitulo() + " (" + musica.getDuracao() + ")");
-            }
+        // Inicializa a lista caso esteja nula para evitar NullPointerException na View
+        if (album.getMusicas() == null) {
+            return java.util.Collections.emptyList();
         }
-    }  */
+        
+        return album.getMusicas();
+    } 
     
 }

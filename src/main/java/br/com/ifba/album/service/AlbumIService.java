@@ -24,8 +24,8 @@ public interface AlbumIService {
     List<Album> findByNome(String nome) throws RuntimeException;
     List<Album> findByAnoLancamento(int anoLancamento) throws RuntimeException;
     
-    // Métodos de Negócio do Diagrama UML
+    // Métodos de Negócio do Diagrama
     void adicionarMusica(Long albumId, Musica musica) throws RuntimeException;
-   // void calcularMediaNotas(Long id) throws RuntimeException;
-   //void exibirTracklist(Long id) throws RuntimeException;
+    double calcularMediaNotas(Long id) throws RuntimeException;
+    List<Musica> exibirTracklist(Long id) throws RuntimeException;
 }

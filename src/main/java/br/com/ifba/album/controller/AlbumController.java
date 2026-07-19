@@ -62,14 +62,14 @@ public class AlbumController implements AlbumIController{
         albumService.adicionarMusica(albumId, musica);
     }
 
-    /*@Override
-    public void calcularMediaNotas(Long id) throws RuntimeException {
-        albumService.calcularMediaNotas(id);
+    @Override
+    public double calcularMediaNotas(Long id) throws RuntimeException {
+        return albumService.calcularMediaNotas(id);
     }
 
     @Override
-    public void exibirTracklist(Long id) throws RuntimeException {
-        albumService.exibirTracklist(id);
-    }*/
+    public List<Musica> exibirTracklist(Long id) throws RuntimeException {
+        return albumService.exibirTracklist(id);
+    }
     
 }

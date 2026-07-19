@@ -4,6 +4,7 @@
  */
 package br.com.ifba.album.entity;
 
+import br.com.ifba.avaliacao.entity.AvaliacaoAlbum;
 import br.com.ifba.banda.entity.Banda;
 import br.com.ifba.infrastructure.entity.PersistenceEntity;
 import br.com.ifba.musica.entity.Musica;
@@ -42,6 +43,7 @@ public class Album extends PersistenceEntity implements Serializable{
     @OneToMany(mappedBy = "album")
     private List<Musica>  musicas;
     
-    //private List<AvaliacaoAlbum> listaavaliacoes;
+    @OneToMany(mappedBy = "albumAvaliado", cascade = jakarta.persistence.CascadeType.ALL, fetch = jakarta.persistence.FetchType.LAZY)
+    private List<AvaliacaoAlbum> listaAvaliacoes;
     
 }
