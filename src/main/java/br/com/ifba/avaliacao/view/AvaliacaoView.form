@@ -220,7 +220,7 @@
             <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
               <Font name="Yu Gothic UI Semibold" size="18" style="0"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="Buscar Review"/>
+            <Property name="text" type="java.lang.String" value="Reviews"/>
           </Properties>
         </Component>
       </SubComponents>

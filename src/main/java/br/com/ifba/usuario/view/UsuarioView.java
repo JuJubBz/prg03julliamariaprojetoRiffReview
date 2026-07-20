@@ -4,6 +4,8 @@
  */
 package br.com.ifba.usuario.view;
 
+import br.com.ifba.avaliacao.view.AvaliacaoView;
+import br.com.ifba.avaliacao.view.AvaliacaoViewAdm;
 import br.com.ifba.usuario.controller.UsuarioIController;
 import br.com.ifba.usuario.entity.Usuario;
 import org.springframework.stereotype.Component;
@@ -21,9 +23,16 @@ public class UsuarioView extends javax.swing.JFrame {
     /**
      * Creates new form UsuarioView
      */
-    public UsuarioView(UsuarioIController usuarioController, UsuarioSave usuarioSave) {
+   
+    private final AvaliacaoView avaliacaoView;
+    private final AvaliacaoViewAdm avaliacaoViewAdmin;
+   
+    public UsuarioView(UsuarioIController usuarioController, UsuarioSave usuarioSave, AvaliacaoView avaliacaoView, 
+                       AvaliacaoViewAdm avaliacaoViewAdmin) {
         this.usuarioController = usuarioController;
         this.usuarioSave = usuarioSave;
+        this.avaliacaoView = avaliacaoView;
+        this.avaliacaoViewAdmin = avaliacaoViewAdmin;
         initComponents();
     }
 
@@ -125,6 +134,7 @@ public class UsuarioView extends javax.swing.JFrame {
 
     private void btnEntrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEntrarActionPerformed
         try {
+            
             String emailDigitado = txtUsuario.getText().trim();
             // Captura o array de char do JPasswordField e converte para String segura
             String senhaDigitada = new String(txtSenha.getPassword()).trim();
@@ -149,8 +159,16 @@ public class UsuarioView extends javax.swing.JFrame {
                         "Sucesso", 
                         javax.swing.JOptionPane.INFORMATION_MESSAGE);
                 
-                // Aqui depois você pode instanciar e dar .setVisible(true) na sua tela principal do sistema!
-                // this.dispose(); 
+                if ("ADMIN".equalsIgnoreCase(usuarioEncontrado.getTipoUsuario())) {
+                this.avaliacaoViewAdmin.setLocationRelativeTo(null); // Centraliza a tela
+                this.avaliacaoViewAdmin.setVisible(true);            // Abre a tela Admin
+            } else {
+                this.avaliacaoView.setLocationRelativeTo(null);      // Centraliza a tela
+                this.avaliacaoView.setVisible(true);                 // Abre a tela Normal
+            }
+            
+            this.dispose(); // Fecha a tela de login atual
+            // ===============================================
                 
             } else {
                 // Se a senha estiver incorreta

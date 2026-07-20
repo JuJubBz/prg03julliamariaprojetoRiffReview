@@ -137,7 +137,9 @@ public class UsuarioSave extends javax.swing.JFrame {
                     "Usuário cadastrado com sucesso!", 
                     "Sucesso", 
                     javax.swing.JOptionPane.INFORMATION_MESSAGE);
-
+                
+            this.dispose();
+            
             // 5. Resetar formulário
             limparCampos();
 

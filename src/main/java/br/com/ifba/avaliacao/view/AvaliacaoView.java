@@ -4,10 +4,13 @@
  */
 package br.com.ifba.avaliacao.view;
 
+import org.springframework.stereotype.Component;
+
 /**
  *
  * @author Julia Freitas
  */
+@Component
 public class AvaliacaoView extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(AvaliacaoView.class.getName());
@@ -78,7 +81,7 @@ public class AvaliacaoView extends javax.swing.JFrame {
         jLabel9.setText("Avaliar Banda");
 
         jLabel8.setFont(new java.awt.Font("Yu Gothic UI Semibold", 0, 18)); // NOI18N
-        jLabel8.setText("Buscar Review");
+        jLabel8.setText("Reviews");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
