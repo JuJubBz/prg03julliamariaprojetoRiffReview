@@ -29,19 +29,19 @@ public class BandaService implements BandaIService{
     // 2. REGRA PARA SALVAR 
     @Override
     public Banda save(Banda banda) throws RuntimeException {
-        // Validação 1: O objeto não pode ser nulo
+        /// Validação 1: O objeto não pode ser nulo
         if (banda == null) {
             throw new RuntimeException("Dados da banda não preenchidos!");
         }
-        
-        // Validação 2: Se já tem ID, não é um cadastro novo (Evita sobrescrever dados)
-        if (banda.getId() != 0) {
-        throw new RuntimeException("Banda já existente no Banco de dados!");
-    }
-        
+
         // Validação de Negócio Customizada: Evitar nomes vazios
         if (banda.getNome() == null || banda.getNome().trim().isEmpty()) {
             throw new RuntimeException("O nome da banda é obrigatório!");
+        }
+        
+        // Se já tem ID válido (diferente de null e > 0), direciona para a regra de atualização
+        if (banda.getId() != 0 && banda.getId() > 0) {
+            return this.update(banda);
         }
 
         return bandaRepository.save(banda);

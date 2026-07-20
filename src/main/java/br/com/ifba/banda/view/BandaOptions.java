@@ -5,6 +5,7 @@
 package br.com.ifba.banda.view;
 
 import br.com.ifba.album.view.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -14,12 +15,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class BandaOptions extends javax.swing.JFrame {
     
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(BandaOptions.class.getName());
+    private final BandaSave bandaSave;
+    private final BandaView bandaView;
 
-    /**
-     * Creates new form AlbumOptions
-     */
-    public BandaOptions() {
+    @Autowired
+    public BandaOptions(BandaSave bandaSave, BandaView bandaView) {
+        this.bandaSave = bandaSave;
+        this.bandaView = bandaView;
         initComponents();
     }
 
@@ -44,8 +46,10 @@ public class BandaOptions extends javax.swing.JFrame {
         jLabel1.setText("Controle de Bandas");
 
         btnCadastrarBanda.setText("CADASTRAR");
+        btnCadastrarBanda.addActionListener(this::btnCadastrarBandaActionPerformed);
 
         btnGerenciarBandas.setText("GERENCIAR");
+        btnGerenciarBandas.addActionListener(this::btnGerenciarBandasActionPerformed);
 
         btnVoltar.setText("VOLTAR");
         btnVoltar.addActionListener(this::btnVoltarActionPerformed);
@@ -101,15 +105,18 @@ public class BandaOptions extends javax.swing.JFrame {
         this.dispose();
     }//GEN-LAST:event_btnVoltarActionPerformed
 
+    private void btnCadastrarBandaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCadastrarBandaActionPerformed
+        bandaSave.setVisible(true);
+    }//GEN-LAST:event_btnCadastrarBandaActionPerformed
+
+    private void btnGerenciarBandasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGerenciarBandasActionPerformed
+        bandaView.setVisible(true);
+    }//GEN-LAST:event_btnGerenciarBandasActionPerformed
+
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -117,13 +124,9 @@ public class BandaOptions extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            System.out.println("Erro ao carregar o visual Nimbus: " + ex.getMessage());
         }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new BandaOptions().setVisible(true));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

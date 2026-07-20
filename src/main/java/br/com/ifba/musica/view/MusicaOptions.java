@@ -46,6 +46,7 @@ public class MusicaOptions extends javax.swing.JFrame {
         btnCadastrarMusica.setText("CADASTRAR");
 
         btnGerenciarMusicas.setText("GERENCIAR");
+        btnGerenciarMusicas.addActionListener(this::btnGerenciarMusicasActionPerformed);
 
         btnVoltar.setText("VOLTAR");
         btnVoltar.addActionListener(this::btnVoltarActionPerformed);
@@ -100,6 +101,10 @@ public class MusicaOptions extends javax.swing.JFrame {
     private void btnVoltarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVoltarActionPerformed
         this.dispose();
     }//GEN-LAST:event_btnVoltarActionPerformed
+
+    private void btnGerenciarMusicasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGerenciarMusicasActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnGerenciarMusicasActionPerformed
 
     /**
      * @param args the command line arguments

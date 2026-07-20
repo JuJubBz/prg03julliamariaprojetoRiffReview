@@ -58,7 +58,7 @@ public class BandaView extends javax.swing.JFrame {
         carregarBandas();
     }
 
-    private void carregarBandas() {
+    public void carregarBandas() {
         try {
             tableModel.setRowCount(0); // Limpa registros antigos
             List<Banda> bandas = bandaController.findAll();
@@ -83,26 +83,27 @@ public class BandaView extends javax.swing.JFrame {
         BotaoAcaoTabela acaoDeletar = new BotaoAcaoTabela(tblBandas, "🗑️ Deletar", new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                executarDeletar();
+                int linha = Integer.parseInt(e.getActionCommand());
+                executarDeletar(linha);
             }
         });
-        tblBandas.getColumnModel().getColumn(4).setCellRenderer((javax.swing.table.TableCellRenderer) acaoDeletar);
-        tblBandas.getColumnModel().getColumn(4).setCellEditor((javax.swing.table.TableCellEditor) acaoDeletar);
+        tblBandas.getColumnModel().getColumn(4).setCellRenderer((TableCellRenderer) acaoDeletar);
+        tblBandas.getColumnModel().getColumn(4).setCellEditor((TableCellEditor) acaoDeletar);
 
         // Inicializa o gerenciador para a coluna Editar (coluna 5)
         BotaoAcaoTabela acaoEditar = new BotaoAcaoTabela(tblBandas, "✏️ Editar", new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                executarEditar();
+                int linha = Integer.parseInt(e.getActionCommand());
+                executarEditar(linha);
             }
         });
-        tblBandas.getColumnModel().getColumn(5).setCellRenderer((javax.swing.table.TableCellRenderer) acaoEditar);
-        tblBandas.getColumnModel().getColumn(5).setCellEditor((javax.swing.table.TableCellEditor) acaoEditar);
+        tblBandas.getColumnModel().getColumn(5).setCellRenderer((TableCellRenderer) acaoEditar);
+        tblBandas.getColumnModel().getColumn(5).setCellEditor((TableCellEditor) acaoEditar);
     }
     
-    private void executarDeletar() {
-        int linha = tblBandas.getEditingRow();
-        if (linha != -1) {
+    private void executarDeletar(int linha) {
+        if (linha >= 0 && linha < tblBandas.getRowCount()) {
             Long idBanda = (Long) tblBandas.getValueAt(linha, 0);
             String nomeBanda = tblBandas.getValueAt(linha, 1).toString();
 
@@ -116,9 +117,9 @@ public class BandaView extends javax.swing.JFrame {
 
             if (resposta == JOptionPane.YES_OPTION) {
                 try {
-                    bandaController.delete(idBanda); // Ajuste para deleteById se necessário
+                    bandaController.delete(idBanda);
                     JOptionPane.showMessageDialog(this, "Banda deletada com sucesso!");
-                    carregarBandas(); // Atualiza a tabela instantaneamente
+                    carregarBandas();
                 } catch (Exception e) {
                     JOptionPane.showMessageDialog(this, "Erro ao deletar: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
                 }
@@ -126,31 +127,19 @@ public class BandaView extends javax.swing.JFrame {
         }
     }
     
-    private void executarEditar() {
-        // Como o botão está dentro de uma célula customizada sob edição, usamos o getEditingRow()
-        int linha = tblBandas.getEditingRow(); 
-        
-        if (linha != -1) {
+    private void executarEditar(int linha) {
+        if (linha >= 0 && linha < tblBandas.getRowCount()) {
             try {
-                // 1. Recupera o ID da linha selecionada
                 Long idBanda = (Long) tblBandas.getValueAt(linha, 0);
-                
-                // 2. Busca a entidade completa atualizada vinda do banco usando o controller
                 Banda bandaParaEditar = this.bandaController.findById(idBanda); 
-                
+
                 if (bandaParaEditar != null) {
-                    // 3. Alimenta a tela injetada com os dados da banda buscada
                     this.bandaSave.prepararEdicao(bandaParaEditar);
-                    
-                    // 4. Torna a interface visível para alteração
                     this.bandaSave.setVisible(true);
-                    
-                    // 5. Fecha a tela de listagem atual
                     this.dispose(); 
                 } else {
                     JOptionPane.showMessageDialog(this, "Banda não encontrada no sistema.", "Aviso", JOptionPane.WARNING_MESSAGE);
                 }
-                
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(this, "Erro ao abrir edição: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
             }
@@ -250,16 +239,19 @@ public class BandaView extends javax.swing.JFrame {
         private final JButton botao;
         private final JTable tabela;
         private Object valorCelula;
+        private int linhaAtual = -1; // Guardará o índice da linha
 
         public BotaoAcaoTabela(JTable tabela, String textoBotao, ActionListener acaoClique) {
             this.tabela = tabela;
             this.botao = new JButton(textoBotao);
-            
+
             this.botao.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     fireEditingStopped();
-                    acaoClique.actionPerformed(e);
+                    // Repassa a linha clicada como o comando da ação
+                    ActionEvent eventoComLinha = new ActionEvent(e.getSource(), e.getID(), String.valueOf(linhaAtual));
+                    acaoClique.actionPerformed(eventoComLinha);
                 }
             });
         }
@@ -272,6 +264,7 @@ public class BandaView extends javax.swing.JFrame {
         @Override
         public java.awt.Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
             this.valorCelula = value;
+            this.linhaAtual = row; // Captura a linha no momento da edição
             return botao;
         }
 
