@@ -134,4 +134,28 @@ public class AvaliacaoService<T extends Avaliacao> implements AvaliacaoIService<
         return avaliacaoRepository.findByUsuario(usuario);
     }
     
+    @Override
+    public List<T> findByBandaId(Long bandaId) throws RuntimeException {
+        if (bandaId == null) {
+            throw new RuntimeException("ID da banda é obrigatório!");
+        }
+        return avaliacaoRepository.findByBandaId(bandaId);
+    }
+
+    @Override
+    public List<T> findByAlbumId(Long albumId) throws RuntimeException {
+        if (albumId == null) {
+            throw new RuntimeException("ID do álbum é obrigatório!");
+        }
+        return avaliacaoRepository.findByAlbumId(albumId);
+    }
+
+    @Override
+    public List<T> findByMusicaId(Long musicaId) throws RuntimeException {
+        if (musicaId == null) {
+            throw new RuntimeException("ID da música é obrigatório!");
+        }
+        return avaliacaoRepository.findByMusicaId(musicaId);
+    }
+    
 }

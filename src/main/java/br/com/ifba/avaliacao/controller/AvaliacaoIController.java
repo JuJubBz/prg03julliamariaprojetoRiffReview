@@ -31,4 +31,11 @@ public interface AvaliacaoIController <T extends Avaliacao> {
     List<T> findByDataCriacao(LocalDateTime data) throws RuntimeException; 
     
     List<Avaliacao> findByUsuario(Usuario usuario) throws RuntimeException;
+    
+    List<T> findByBandaId(Long bandaId) throws RuntimeException;
+
+    List<T> findByAlbumId(Long albumId) throws RuntimeException;
+
+    List<T> findByMusicaId(Long musicaId) throws RuntimeException;
+    
 }

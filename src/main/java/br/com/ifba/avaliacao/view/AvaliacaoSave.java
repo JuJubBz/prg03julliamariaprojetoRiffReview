@@ -5,6 +5,9 @@
 package br.com.ifba.avaliacao.view;
 
 import br.com.ifba.avaliacao.controller.AvaliacaoController;
+import br.com.ifba.avaliacao.entity.AvaliacaoAlbum;
+import br.com.ifba.avaliacao.entity.AvaliacaoBanda;
+import br.com.ifba.avaliacao.entity.AvaliacaoMusica;
 import br.com.ifba.usuario.entity.Usuario;
 import java.time.LocalDateTime;
 import javax.swing.JOptionPane;
@@ -22,7 +25,13 @@ import org.springframework.stereotype.Component;
 public class AvaliacaoSave extends javax.swing.JFrame {
     
     @Autowired
-    private AvaliacaoController avaliacaoController;
+    private AvaliacaoController<AvaliacaoBanda> avaliacaoBandaController;
+
+    @Autowired
+    private AvaliacaoController<AvaliacaoAlbum> avaliacaoAlbumController;
+
+    @Autowired
+    private AvaliacaoController<AvaliacaoMusica> avaliacaoMusicaController;
     
     // Atributos para guardar o estado
     private Usuario usuarioLogado;
@@ -168,61 +177,54 @@ public class AvaliacaoSave extends javax.swing.JFrame {
 
     private void btnSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarActionPerformed
         int indexSelecionado = cbxItemAvaliado.getSelectedIndex();
-        
+
         if (indexSelecionado == -1) {
             JOptionPane.showMessageDialog(this, "Por favor, selecione um item para avaliar.", "Erro", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        // Captura os dados da interface gráfica
-        // (Fazendo o cast do spinner para Number para aceitar tanto Integer quanto Double com segurança)
         double nota = ((Number) spnNota.getValue()).doubleValue();
         String comentario = txtComentario.getText();
-        
-        // Resgata o objeto original correspondente do banco a partir da lista gravada
         Object itemEscolhido = listaDeItensOriginais.get(indexSelecionado);
 
         try {
             if ("BANDA".equals(contextoAtual)) {
-                br.com.ifba.avaliacao.entity.AvaliacaoBanda novaAvaliacao = new br.com.ifba.avaliacao.entity.AvaliacaoBanda();
-                // Vincula os dados comuns herdados de Avaliacao
+                AvaliacaoBanda novaAvaliacao = new AvaliacaoBanda();
                 novaAvaliacao.setUsuario(this.usuarioLogado);
                 novaAvaliacao.setNota(nota);
                 novaAvaliacao.setComentario(comentario);
                 novaAvaliacao.setDataCriacao(LocalDateTime.now());
-                
-                // Vincula o relacionamento específico da subclasse
                 novaAvaliacao.setBandaAvaliada((br.com.ifba.banda.entity.Banda) itemEscolhido);
-                
-                // Salva pelo controller
-                avaliacaoController.save(novaAvaliacao);
-                
+
+                // Salva utilizando o controller específico de Banda
+                avaliacaoBandaController.save(novaAvaliacao);
+
             } else if ("ALBUM".equals(contextoAtual)) {
-                br.com.ifba.avaliacao.entity.AvaliacaoAlbum novaAvaliacao = new br.com.ifba.avaliacao.entity.AvaliacaoAlbum();
+                AvaliacaoAlbum novaAvaliacao = new AvaliacaoAlbum();
                 novaAvaliacao.setUsuario(this.usuarioLogado);
                 novaAvaliacao.setNota(nota);
                 novaAvaliacao.setComentario(comentario);
                 novaAvaliacao.setDataCriacao(LocalDateTime.now());
-                
                 novaAvaliacao.setAlbumAvaliado((br.com.ifba.album.entity.Album) itemEscolhido);
-                
-                avaliacaoController.save(novaAvaliacao);
-                
+
+                // Salva utilizando o controller específico de Album
+                avaliacaoAlbumController.save(novaAvaliacao);
+
             } else if ("MUSICA".equals(contextoAtual)) {
-                br.com.ifba.avaliacao.entity.AvaliacaoMusica novaAvaliacao = new br.com.ifba.avaliacao.entity.AvaliacaoMusica();
+                AvaliacaoMusica novaAvaliacao = new AvaliacaoMusica();
                 novaAvaliacao.setUsuario(this.usuarioLogado);
                 novaAvaliacao.setNota(nota);
                 novaAvaliacao.setComentario(comentario);
                 novaAvaliacao.setDataCriacao(LocalDateTime.now());
-                
                 novaAvaliacao.setMusicaAvaliada((br.com.ifba.musica.entity.Musica) itemEscolhido);
-                
-                avaliacaoController.save(novaAvaliacao);
+
+                // Salva utilizando o controller específico de Musica
+                avaliacaoMusicaController.save(novaAvaliacao);
             }
 
             JOptionPane.showMessageDialog(this, "Avaliação salva com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
-            this.dispose(); // Fecha o formulário atual após salvar
-            
+            this.dispose();
+
         } catch (Exception e) {
             System.err.println("Erro ao salvar a avaliação: " + e.getMessage());
             e.printStackTrace();

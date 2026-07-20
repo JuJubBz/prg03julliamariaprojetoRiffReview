@@ -9,6 +9,8 @@ import br.com.ifba.usuario.entity.Usuario;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -25,4 +27,13 @@ public interface AvaliacaoRepository<T extends Avaliacao> extends JpaRepository<
     List<T> findByDataCriacao(LocalDateTime dataCriacao);
     
     List<Avaliacao> findByUsuario(Usuario usuario);
+    
+    @Query("SELECT a FROM AvaliacaoBanda a WHERE a.bandaAvaliada.id = :bandaId")
+    List<T> findByBandaId(@Param("bandaId") Long bandaId);
+    
+    @Query("SELECT a FROM AvaliacaoAlbum a WHERE a.albumAvaliado.id = :albumId")
+    List<T> findByAlbumId(@Param("albumId") Long albumId);
+    
+    @Query("SELECT a FROM AvaliacaoMusica a WHERE a.musicaAvaliada.id = :musicaId")
+    List<T> findByMusicaId(@Param("musicaId") Long musicaId);
 }

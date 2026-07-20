@@ -4,8 +4,15 @@
  */
 package br.com.ifba.avaliacao.view;
 
+import br.com.ifba.album.controller.AlbumIController;
 import br.com.ifba.avaliacao.controller.AvaliacaoIController;
+import br.com.ifba.avaliacao.entity.Avaliacao;
+import br.com.ifba.banda.controller.BandaIController;
+import br.com.ifba.musica.controller.MusicaIController;
+import java.util.List;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -15,19 +22,71 @@ import org.springframework.stereotype.Component;
 @Component
 public class AvaliacaoViewDetails extends javax.swing.JFrame {
     
-    private final AvaliacaoIController avaliacaoController;
-    
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(AvaliacaoViewDetails.class.getName());
+    private final BandaIController bandaController;
+    private final AlbumIController albumController;
+    private final MusicaIController musicaController;
 
-    /**
-     * Creates new form AvaliacaoSearchView
-     */
-    public AvaliacaoViewDetails(AvaliacaoIController avaliacaoController) {
+    @Autowired
+    public AvaliacaoViewDetails(BandaIController bandaController, 
+                                AlbumIController albumController, 
+                                MusicaIController musicaController) {
+        this.bandaController = bandaController;
+        this.albumController = albumController;
+        this.musicaController = musicaController;
         
-        this.avaliacaoController = avaliacaoController;
         initComponents();
+        
+        // Ação do botão VOLTAR
+        btnVoltar.addActionListener(e -> this.dispose());
     }
 
+    public void carregarDetalhes(Long itemId, String nomeItem, String tipoItem, List<Avaliacao> avaliacoes) {
+        lblItemSelecionado.setText(nomeItem);
+        
+        double media = 0.0;
+        
+        try {
+            if (tipoItem != null) {
+                switch (tipoItem.toUpperCase()) {
+                    case "BANDA":
+                        media = bandaController.calcularMediaAvaliacoes(itemId);
+                        break;
+                    case "ALBUM":
+                    case "ÁLBUM":
+                        media = albumController.calcularMediaNotas(itemId);
+                        break;
+                    case "MUSICA":
+                    case "MÚSICA":
+                        media = musicaController.calcularMediaNotas(itemId);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            lblMediaGeral.setText(String.format("%.1f", media));
+        } catch (RuntimeException e) {
+            lblMediaGeral.setText("N/A");
+            JOptionPane.showMessageDialog(this, 
+                "Erro ao calcular a média: " + e.getMessage(), 
+                "Erro", 
+                JOptionPane.ERROR_MESSAGE);
+        }
+
+        // Atualiza a tabela de avaliações dos usuários
+        DefaultTableModel model = (DefaultTableModel) tblResultados.getModel();
+        model.setRowCount(0); // Limpa as linhas anteriores
+
+        if (avaliacoes != null) {
+            for (Avaliacao av : avaliacoes) {
+                model.addRow(new Object[]{
+                    av.getUsuario() != null ? av.getUsuario().getNome() : "Anônimo",
+                    av.getNota(),
+                    av.getComentario() // Ajuste se a propriedade da mensagem/texto for diferente
+                });
+            }
+        }
+    }
+    
     public void inicializarTela(String nomeItem, String tipoItem) {
         // 1. Define o texto do JLabel ou JTextField do "Item Selecionado"
         lblItemSelecionado.setText(nomeItem); 

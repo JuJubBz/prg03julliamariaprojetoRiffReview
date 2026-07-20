@@ -65,4 +65,19 @@ public class AvaliacaoController <T extends Avaliacao> implements AvaliacaoICont
         return avaliacaoService.findByUsuario(usuario);
     }
     
+    @Override
+    public List<T> findByBandaId(Long bandaId) throws RuntimeException {
+        return avaliacaoService.findByBandaId(bandaId);
+    }
+
+    @Override
+    public List<T> findByAlbumId(Long albumId) throws RuntimeException {
+        return avaliacaoService.findByAlbumId(albumId);
+    }
+
+    @Override
+    public List<T> findByMusicaId(Long musicaId) throws RuntimeException {
+        return avaliacaoService.findByMusicaId(musicaId);
+    }
+    
 }
