@@ -18,4 +18,5 @@ public interface BandaIController  {
     void delete(Long id) throws RuntimeException;
     //void adicionarAlbum(Long bandaId, Object album) throws RuntimeException; vou add dps (nao adcionei pq é redundante. Isso é decidido na hora de salvar o album) 
     double calcularMediaAvaliacoes(Long bandaId) throws RuntimeException; 
+    Banda findById(Long id) throws RuntimeException;
 }

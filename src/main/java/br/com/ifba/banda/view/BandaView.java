@@ -18,6 +18,7 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -33,14 +34,18 @@ public class BandaView extends javax.swing.JFrame {
     private final MusicaIController musicaController;
     private final DefaultTableModel tableModel;
 
+    
+    private final BandaSave bandaSave;
+    
     /**
      * Creates new form BandaView
      */
-    public BandaView(AlbumIController albumController, BandaIController bandaController, MusicaIController musicaController) {
+    @Autowired
+    public BandaView(AlbumIController albumController, BandaIController bandaController, MusicaIController musicaController, BandaSave bandaSave) {
         this.albumController = albumController;
         this.bandaController = bandaController;
         this.musicaController = musicaController;
-        
+        this.bandaSave = bandaSave;
         initComponents();
         
         // Pega o modelo das colunas definido no seu Design (ID, Título, Genero, Duração, Deletar, Editar)
@@ -122,17 +127,29 @@ public class BandaView extends javax.swing.JFrame {
     }
     
     private void executarEditar() {
-        int linha = tblBandas.getEditingRow();
+        // Como o botão está dentro de uma célula customizada sob edição, usamos o getEditingRow()
+        int linha = tblBandas.getEditingRow(); 
+        
         if (linha != -1) {
-            Long idBanda = (Long) tblBandas.getValueAt(linha, 0);
-            
             try {
-                // Redirecionamento futuro para a tela de salvamento em modo edição:
-                // BandaSave telaCadastro = new BandaSave(albumController, bandaController, musicaController);
-                // telaCadastro.setVisible(true);
-                // this.dispose();
+                // 1. Recupera o ID da linha selecionada
+                Long idBanda = (Long) tblBandas.getValueAt(linha, 0);
                 
-                JOptionPane.showMessageDialog(this, "Ação Editar acionada para o ID: " + idBanda);
+                // 2. Busca a entidade completa atualizada vinda do banco usando o controller
+                Banda bandaParaEditar = this.bandaController.findById(idBanda); 
+                
+                if (bandaParaEditar != null) {
+                    // 3. Alimenta a tela injetada com os dados da banda buscada
+                    this.bandaSave.prepararEdicao(bandaParaEditar);
+                    
+                    // 4. Torna a interface visível para alteração
+                    this.bandaSave.setVisible(true);
+                    
+                    // 5. Fecha a tela de listagem atual
+                    this.dispose(); 
+                } else {
+                    JOptionPane.showMessageDialog(this, "Banda não encontrada no sistema.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                }
                 
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(this, "Erro ao abrir edição: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);

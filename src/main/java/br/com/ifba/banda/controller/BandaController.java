@@ -44,5 +44,10 @@ public class BandaController implements BandaIController{
     public double calcularMediaAvaliacoes(Long bandaId) throws RuntimeException {
         return bandaService.calcularMediaAvaliacoes(bandaId);
     }
+
+    @Override
+    public Banda findById(Long id) throws RuntimeException {
+       return bandaService.findById(id);
+    }
     
 }

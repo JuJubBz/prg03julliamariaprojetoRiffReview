@@ -26,6 +26,8 @@ public class AlbumSave extends javax.swing.JFrame {
     private final BandaIController bandaController;
     private final MusicaIController musicaController;
     
+    // Atributo para controlar se a tela está em modo de edição ou inserção
+    private Album albumEmEdicao = null;
     private List<Musica> musicasSelecionadas = new ArrayList<>();
     private DefaultTableModel tableModel;
     /**
@@ -48,13 +50,49 @@ public class AlbumSave extends javax.swing.JFrame {
         carregarBandas();
     }
 
+    // Método público chamado pela tela de listagem para injetar os dados em modo de edição
+    public void preencherCampos(Album album) {
+        if (album != null) {
+            this.albumEmEdicao = album;
+            
+            // Altera o título visual da tela para guiar o usuário
+            jLabel1.setText("EDITAR ALBUM");
+            
+            // Popula os componentes visuais básicos
+            txtTitulo.setText(album.getNome());
+            spinAno.setValue(album.getAnoLancamento());
+            
+            // Seleciona a banda correspondente no ComboBox baseado no ID (Protegido contra erro de Cast)
+            if (album.getBanda() != null) {
+                for (int i = 0; i < comboBanda.getItemCount(); i++) {
+                    Object item = comboBanda.getItemAt(i);
+                    if (item instanceof Banda) {
+                        Banda b = (Banda) item;
+                        if (b.getId() == (album.getBanda().getId())) {
+                            comboBanda.setSelectedIndex(i);
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            // Clona ou atribui as músicas vinculadas ao álbum para a lista de manipulação da tabela
+            if (album.getMusicas() != null) {
+                this.musicasSelecionadas = new ArrayList<>(album.getMusicas());
+            } else {
+                this.musicasSelecionadas = new ArrayList<>();
+            }
+            
+            atualizarTabelaMusicas();
+        }
+    }
     
     private void carregarBandas() {
         try {
             comboBanda.removeAllItems();
             List<Banda> bandas = bandaController.findAll();
             for (Banda b : bandas) {
-                comboBanda.addItem(b); // Adiciona o objeto completo. Garanta que a entidade Banda tenha um bom toString()
+                comboBanda.addItem(b);
             }
         } catch (Exception e) {
             System.out.println("Erro ao carregar as bandas no ComboBox: " + e.getMessage());
@@ -278,56 +316,63 @@ public class AlbumSave extends javax.swing.JFrame {
 
     private void btnSalvarAlbumActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarAlbumActionPerformed
         try {
-            // 1. Validação básica de campos textuais
-            if (txtTitulo.getText().trim().isEmpty() || comboBanda.getSelectedItem() == null) {
-                javax.swing.JOptionPane.showMessageDialog(this, 
-                        "Por favor, preencha o Título do Álbum e selecione uma Banda.", 
-                        "Aviso", 
-                        javax.swing.JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-
-            // 2. Instancia a Entidade Álbum
-            Album novoAlbum = new Album();
-            novoAlbum.setNome(txtTitulo.getText().trim());
-            novoAlbum.setAnoLancamento((int) spinAno.getValue());
-            novoAlbum.setBanda((Banda) comboBanda.getSelectedItem());
-            
-            // 3. Passa a lista temporária de músicas selecionadas para o Álbum
-            novoAlbum.setMusicas(musicasSelecionadas);
-            
-            // 4. Atualiza o mapeamento bidirecional da JPA: diz para cada música quem é o álbum dela
-            for (Musica m : musicasSelecionadas) {
-                m.setAlbum(novoAlbum);
-            }
-            
-            // 5. Salva o pacote completo no banco (Cascata tratará o resto se mapeado)
-            this.albumController.save(novoAlbum);
-            
+        // 1. Validação básica de campos textuais
+        if (txtTitulo.getText().trim().isEmpty() || comboBanda.getSelectedItem() == null) {
             javax.swing.JOptionPane.showMessageDialog(this, 
-                    "Álbum '" + novoAlbum.getNome() + "' e suas faixas salvos com sucesso!", 
-                    "Sucesso", 
-                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
-            
-            limparCampos();
-            
-        } catch (Exception e) {
-            javax.swing.JOptionPane.showMessageDialog(this, 
-                    "Erro ao salvar o álbum: " + e.getMessage(), 
-                    "Erro no Sistema", 
-                    javax.swing.JOptionPane.ERROR_MESSAGE);
+                    "Por favor, preencha o Título do Álbum e selecione uma Banda.", 
+                    "Aviso", 
+                    javax.swing.JOptionPane.WARNING_MESSAGE);
+            return;
         }
+
+        //Decide se cria um novo objeto ou se reaproveita o que está em edição (mantendo o ID)
+        Album albumParaSalvar = (this.albumEmEdicao != null) ? this.albumEmEdicao : new Album();
+        
+        albumParaSalvar.setNome(txtTitulo.getText().trim());
+        albumParaSalvar.setAnoLancamento((int) spinAno.getValue());
+        albumParaSalvar.setBanda((Banda) comboBanda.getSelectedItem());
+        
+        // 3. Passa a lista temporária de músicas selecionadas para o Álbum
+        albumParaSalvar.setMusicas(musicasSelecionadas);
+        
+        // 4. Atualiza o mapeamento bidirecional da JPA
+        for (Musica m : musicasSelecionadas) {
+            m.setAlbum(albumParaSalvar);
+        }
+        
+        // 5. Salva ou atualiza o pacote completo no banco
+        this.albumController.save(albumParaSalvar);
+        
+        //Mensagem dinâmica baseada na ação realizada
+        String acao = (this.albumEmEdicao != null) ? "atualizado" : "salvo";
+        javax.swing.JOptionPane.showMessageDialog(this, 
+                "Álbum '" + albumParaSalvar.getNome() + "' e suas faixas foram " + acao + "s com sucesso!", 
+                "Sucesso", 
+                javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        
+        limparCampos();
+        
+    } catch (Exception e) {
+        javax.swing.JOptionPane.showMessageDialog(this, 
+                "Erro ao salvar o álbum: " + e.getMessage(), 
+                "Erro no Sistema", 
+                javax.swing.JOptionPane.ERROR_MESSAGE);
+    }
     }//GEN-LAST:event_btnSalvarAlbumActionPerformed
 
     private void limparCampos() {
         txtTitulo.setText("");
-        spinAno.setValue(2026); // Reseta para o ano padrão
+        spinAno.setValue(2026); 
         if (comboBanda.getItemCount() > 0) comboBanda.setSelectedIndex(0);
         musicasSelecionadas.clear();
         atualizarTabelaMusicas();
+        
+        // Reseta o estado da tela para o modo de inserção padrão
+        this.albumEmEdicao = null;
+        jLabel1.setText("ADICIONAR ALBUM");
+        
         txtTitulo.requestFocus();
     }
-    
     /**
      * @param args the command line arguments
      */

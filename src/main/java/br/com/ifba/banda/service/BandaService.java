@@ -97,4 +97,15 @@ public class BandaService implements BandaIService{
         // 4. Retorna a média aritmética simples
         return soma / banda.getListaAvaliacoes().size();
     }
+    
+    @Override
+    public Banda findById(Long id) throws RuntimeException {
+    if (id == null) {
+        throw new RuntimeException("ID inválido para busca!");
+    }
+
+    return bandaRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Banda não encontrada!"));
+    }
+    
 }

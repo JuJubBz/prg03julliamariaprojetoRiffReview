@@ -125,24 +125,29 @@ public class MusicaView extends javax.swing.JFrame {
     
     private void executarEditar() {
         int linha = tblMusicas.getEditingRow();
-        if (linha != -1) {
-            Long idMusica = (Long) tblMusicas.getValueAt(linha, 0);
+    if (linha != -1) {
+        Long idMusica = (Long) tblMusicas.getValueAt(linha, 0);
+        
+        try {
+            // 1. Busca a música completa vinda do banco usando o ID da linha selecionada
+            Musica musicaParaEditar = musicaController.findById(idMusica); // Mude para findById se for o padrão do seu controller
             
-            try {
-                // Aqui você buscaria a música caso fosse abrir a tela de salvamento em modo edição
-                // Musica musicaParaEditar = musicaController.findById(idMusica);
+            if (musicaParaEditar != null) {
+                // 2. Cria ou abre a instância da tela de salvar enviando o controller
+                MusicaSave telaCadastro = new MusicaSave(musicaController);
                 
-                // Exemplo de redirecionamento caso você possua a tela MusicaSave:
-                // MusicaSave telaCadastro = new MusicaSave(albumController, bandaController, musicaController);
-                // telaCadastro.setVisible(true);
-                // this.dispose();
+                // 3. Alimenta o formulário com a música que acabamos de buscar
+                telaCadastro.prepararEdicao(musicaParaEditar);
                 
-                JOptionPane.showMessageDialog(this, "Ação Editar acionada para o ID: " + idMusica);
-                
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(this, "Erro ao abrir edição: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+                // 4. Exibe a interface para o usuário alterar
+                telaCadastro.setVisible(true);
+                this.dispose(); // Fecha a tela de listagem se desejar
             }
+            
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Erro ao abrir edição: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
         }
+    }
     }
     
     /**

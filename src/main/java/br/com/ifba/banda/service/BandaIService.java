@@ -17,4 +17,5 @@ public interface BandaIService {
     Banda update(Banda banda) throws RuntimeException;
     void delete(Long id) throws RuntimeException;
     double calcularMediaAvaliacoes(Long bandaId) throws RuntimeException;
+    Banda findById(Long id) throws RuntimeException;
 }

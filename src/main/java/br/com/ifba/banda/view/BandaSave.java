@@ -5,6 +5,7 @@
 package br.com.ifba.banda.view;
 
 import br.com.ifba.banda.controller.BandaIController;
+import br.com.ifba.banda.entity.Banda;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +18,7 @@ public class BandaSave extends javax.swing.JFrame {
     
     // TROCAMOS AQUI: Agora usamos o tipo da INTERFACE
     private final BandaIController bandaController;
-    
+    private Banda bandaEmEdicao = null; // Guarda a instância caso seja uma edição
     /**
      * Creates new form BandaSave
      */
@@ -138,45 +139,63 @@ public class BandaSave extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    // Método público chamado pela tela de listagem para injetar os dados em modo de edição
+    public void prepararEdicao(Banda banda) {
+        this.bandaEmEdicao = banda;
+        
+        // Altera os textos da interface de forma dinâmica
+        jLabel6.setText("EDITAR BANDA");
+        btnSalvar.setText("ATUALIZAR");
+        
+        // Preenche os campos com os dados existentes
+        txtNome.setText(banda.getNome());
+        txtGeneroPrincipal.setText(banda.getGeneroPrincipal());
+        spnAnoFormacao.setValue(banda.getAnoFormacao());
+    }
+    
     private void btnSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarActionPerformed
         try {
-        // 1. Validar se os campos de texto não foram deixados em branco
-        if (txtNome.getText().trim().isEmpty() || txtGeneroPrincipal.getText().trim().isEmpty()) {
-            javax.swing.JOptionPane.showMessageDialog(this, 
-                    "Por favor, preencha o Nome e o Gênero antes de salvar.", 
-                    "Aviso", 
-                    javax.swing.JOptionPane.WARNING_MESSAGE);
-            return; // Interrompe a execução para não salvar dados incompletos
-        }
+            // 1. Validar se os campos de texto não foram deixados em branco
+            if (txtNome.getText().trim().isEmpty() || txtGeneroPrincipal.getText().trim().isEmpty()) {
+                javax.swing.JOptionPane.showMessageDialog(this, 
+                        "Por favor, preencha o Nome e o Gênero antes de salvar.", 
+                        "Aviso", 
+                        javax.swing.JOptionPane.WARNING_MESSAGE);
+                return; 
+            }
 
-        // 2. Criar o objeto Banda (Entidade) e preencher com os dados da tela
-        br.com.ifba.banda.entity.Banda novaBanda = new br.com.ifba.banda.entity.Banda();
-        novaBanda.setNome(txtNome.getText().trim());
-        novaBanda.setGeneroPrincipal(txtGeneroPrincipal.getText().trim());
-        
-        // Pegamos o valor numérico direto do JSpinner (sem o ponto de milhar!)
-        int ano = (int) spnAnoFormacao.getValue();
-        novaBanda.setAnoFormacao(ano);
-        
-        // 3. Chamar o Controller usando a Interface injetada pelo Spring
-        this.bandaController.save(novaBanda);
-        
-        // 4. Exibir caixinha de sucesso na tela
-        javax.swing.JOptionPane.showMessageDialog(this, 
-                "Banda '" + novaBanda.getNome() + "' salva com sucesso na nuvem!", 
-                "Sucesso", 
-                javax.swing.JOptionPane.INFORMATION_MESSAGE);
-        
-        // 5. Limpar os campos para permitir o próximo cadastro
-        limparCampos();
-        
-    } catch (Exception e) {
-        // Caso ocorra algum erro de conexão com o Supabase ou erro de banco
-        javax.swing.JOptionPane.showMessageDialog(this, 
-                "Erro ao salvar a banda: " + e.getMessage(), 
-                "Erro no Sistema", 
-                javax.swing.JOptionPane.ERROR_MESSAGE);
-    }
+            // 2. Determinar se cria uma nova instância ou usa a que está sendo editada (mantendo o ID)
+            Banda bandaParaSalvar = (this.bandaEmEdicao != null) ? this.bandaEmEdicao : new Banda();
+            
+            bandaParaSalvar.setNome(txtNome.getText().trim());
+            bandaParaSalvar.setGeneroPrincipal(txtGeneroPrincipal.getText().trim());
+            
+            int ano = (int) spnAnoFormacao.getValue();
+            bandaParaSalvar.setAnoFormacao(ano);
+            
+            // 3. Chamar o Controller usando a Interface injetada pelo Spring
+            this.bandaController.save(bandaParaSalvar);
+            
+            // 4. Mensagem de sucesso dinâmica
+            String acaoCompleta = (this.bandaEmEdicao == null) ? "salva" : "atualizada";
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                    "Banda '" + bandaParaSalvar.getNome() + "' " + acaoCompleta + " com sucesso!", 
+                    "Sucesso", 
+                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
+            
+            // 5. Se for edição, fecha a janela. Se for cadastro, limpa a tela.
+            if (this.bandaEmEdicao != null) {
+                this.dispose(); 
+            } else {
+                limparCampos();
+            }
+            
+        } catch (Exception e) {
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                    "Erro ao salvar a banda: " + e.getMessage(), 
+                    "Erro no Sistema", 
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btnSalvarActionPerformed
 
     private void txtNomeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNomeActionPerformed
@@ -192,10 +211,13 @@ public class BandaSave extends javax.swing.JFrame {
     }//GEN-LAST:event_btnCancelarActionPerformed
 
     private void limparCampos() {
+        this.bandaEmEdicao = null; // Reseta o estado para modo cadastro
+        jLabel6.setText("ADICIONAR BANDA");
+        btnSalvar.setText("SALVAR");
         txtNome.setText("");
         txtGeneroPrincipal.setText("");
-        spnAnoFormacao.setValue(2026); // Reseta o seletor para o ano atual
-        txtNome.requestFocus();        // Faz o cursor voltar a piscar no campo Nome
+        spnAnoFormacao.setValue(2026); 
+        txtNome.requestFocus();
     }
     /**
      * @param args the command line arguments

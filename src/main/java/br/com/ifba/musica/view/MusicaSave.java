@@ -4,7 +4,7 @@
  */
 package br.com.ifba.musica.view;
 
-import br.com.ifba.album.view.*;
+//import br.com.ifba.album.view.*;
 import br.com.ifba.musica.controller.MusicaIController;
 import br.com.ifba.musica.entity.Musica;
 import org.springframework.stereotype.Component;
@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 public class MusicaSave extends javax.swing.JFrame {
     
     private final MusicaIController musicaController;
+    private Musica musicaEmEdicao; // Guarda a instância caso seja uma edição
     /**
      * Creates new form AlbumSave
      */
@@ -27,6 +28,26 @@ public class MusicaSave extends javax.swing.JFrame {
         spnDuracao.setEditor(new javax.swing.JSpinner.NumberEditor(spnDuracao, "#"));
     }
 
+    public void prepararEdicao(Musica musica) {
+        this.musicaEmEdicao = musica;
+        
+        // Altera os textos da interface de forma dinâmica
+        jLabel1.setText("EDITAR MÚSICA");
+        btnSalvarMusica.setText("ATUALIZAR MÚSICA");
+        
+        // Preenche os campos com os dados existentes
+        txtNome.setText(musica.getTitulo());
+        txtGenero.setText(musica.getGeneroPrincipal());
+        
+        try {
+            if (musica.getDuracao() != null) {
+                spnDuracao.setValue(Integer.valueOf(musica.getDuracao()));
+            }
+        } catch (NumberFormatException e) {
+            spnDuracao.setValue(0);
+        }
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -133,29 +154,40 @@ public class MusicaSave extends javax.swing.JFrame {
                         "Por favor, preencha o Nome e o Gênero antes de salvar.", 
                         "Aviso", 
                         javax.swing.JOptionPane.WARNING_MESSAGE);
-                return; // Corta o fluxo se os campos não estiverem preenchidos
+                return; 
             }
 
-            // 2. Instanciar a entidade Música e preencher com o que está na tela
-            Musica novaMusica = new Musica();
-            novaMusica.setTitulo(txtNome.getText().trim());
-            novaMusica.setGeneroPrincipal(txtGenero.getText().trim());
+            // 2. Determinar se cria uma nova instância ou usa a que está sendo editada (que já possui o ID)
+            Musica musicaParaSalvar;
+            if (this.musicaEmEdicao == null) {
+                musicaParaSalvar = new Musica(); // Modo Cadastro
+            } else {
+                musicaParaSalvar = this.musicaEmEdicao; // Modo Edição
+            }
             
-            // Pega o valor inteiro correspondente aos segundos/minutos do JSpinner
+            // Define os valores vindos dos campos da tela
+            musicaParaSalvar.setTitulo(txtNome.getText().trim());
+            musicaParaSalvar.setGeneroPrincipal(txtGenero.getText().trim());
+            
             String duracaoStr = String.valueOf(spnDuracao.getValue());
-            novaMusica.setDuracao(duracaoStr);
+            musicaParaSalvar.setDuracao(duracaoStr);
             
-            // 3. Persistir os dados utilizando a camada do Controller injetada
-            this.musicaController.save(novaMusica);
+            // 3. Persistir os dados utilizando o Controller (O JPA faz update automaticamente se o ID existir)
+            this.musicaController.save(musicaParaSalvar);
             
-            // 4. Alertar o usuário sobre a gravação com sucesso
+            // 4. Mensagem de sucesso dinâmica
+            String acaoCompleta = (this.musicaEmEdicao == null) ? "salva" : "atualizada";
             javax.swing.JOptionPane.showMessageDialog(this, 
-                    "Música '" + novaMusica.getTitulo() + "' salva com sucesso na nuvem!", 
+                    "Música '" + musicaParaSalvar.getTitulo() + "' " + acaoCompleta + " com sucesso!", 
                     "Sucesso", 
                     javax.swing.JOptionPane.INFORMATION_MESSAGE);
             
-            // 5. Resetar o formulário para entradas subsequentes
-            limparCampos();
+            // 5. Se for edição, fecha a janela para voltar à tabela. Se for cadastro, limpa a tela para a próxima.
+            if (this.musicaEmEdicao != null) {
+                this.dispose(); 
+            } else {
+                limparCampos();
+            }
             
         } catch (Exception e) {
             javax.swing.JOptionPane.showMessageDialog(this, 
@@ -170,10 +202,13 @@ public class MusicaSave extends javax.swing.JFrame {
     }//GEN-LAST:event_btnCancelarActionPerformed
 
     private void limparCampos() {
+        this.musicaEmEdicao = null; // Reseta o estado para modo cadastro
+        jLabel1.setText("ADICIONAR MUSICA");
+        btnSalvarMusica.setText("SALVAR MUSICA");
         txtNome.setText("");
         txtGenero.setText("");
         spnDuracao.setValue(0);  
-        txtNome.requestFocus();  
+        txtNome.requestFocus(); 
     }
     
     /**
