@@ -42,4 +42,7 @@ public class Usuario extends PersistenceEntity implements Serializable{
     @OneToMany(mappedBy = "usuario")
     private List<Avaliacao> listaAvaliacoes;
     
+    @Column(name = "tipo_usuario", nullable = false)
+    private String tipoUsuario = "NORMAL";
+    
 }
