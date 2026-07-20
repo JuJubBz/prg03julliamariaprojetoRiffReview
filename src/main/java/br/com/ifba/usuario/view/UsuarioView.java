@@ -136,10 +136,8 @@ public class UsuarioView extends javax.swing.JFrame {
         try {
             
             String emailDigitado = txtUsuario.getText().trim();
-            // Captura o array de char do JPasswordField e converte para String segura
             String senhaDigitada = new String(txtSenha.getPassword()).trim();
 
-            // 1. Validação simples de campos vazios
             if (emailDigitado.isEmpty() || senhaDigitada.isEmpty()) {
                 javax.swing.JOptionPane.showMessageDialog(this, 
                         "Por favor, insira o usuário (e-mail) e a senha.", 
@@ -148,10 +146,8 @@ public class UsuarioView extends javax.swing.JFrame {
                 return;
             }
 
-            // 2. Busca o usuário cadastrado no banco usando o e-mail coletado
             Usuario usuarioEncontrado = this.usuarioController.findByEmail(emailDigitado);
 
-            // 3. Validação da regra de negócio: Checar se a senha confere
             if (usuarioEncontrado.getSenha().equals(senhaDigitada)) {
                 
                 javax.swing.JOptionPane.showMessageDialog(this, 
@@ -159,19 +155,21 @@ public class UsuarioView extends javax.swing.JFrame {
                         "Sucesso", 
                         javax.swing.JOptionPane.INFORMATION_MESSAGE);
                 
+                // === AQUI ENTRA A INTEGRAÇÃO DAS VIEWS COM SESSÃO ===
                 if ("ADMIN".equalsIgnoreCase(usuarioEncontrado.getTipoUsuario())) {
-                this.avaliacaoViewAdmin.setLocationRelativeTo(null); // Centraliza a tela
-                this.avaliacaoViewAdmin.setVisible(true);            // Abre a tela Admin
-            } else {
-                this.avaliacaoView.setLocationRelativeTo(null);      // Centraliza a tela
-                this.avaliacaoView.setVisible(true);                 // Abre a tela Normal
-            }
+                    this.avaliacaoViewAdmin.inicializarTela(usuarioEncontrado); // Passa o usuário logado para a tela ADM
+                    this.avaliacaoViewAdmin.setLocationRelativeTo(null); 
+                    this.avaliacaoViewAdmin.setVisible(true);            
+                } else {
+                    // Se você criou um método similar na visualização comum, chame-o aqui também:
+                    // this.avaliacaoView.inicializarTela(usuarioEncontrado);
+                    this.avaliacaoView.setLocationRelativeTo(null);      
+                    this.avaliacaoView.setVisible(true);                 
+                }
             
-            this.dispose(); // Fecha a tela de login atual
-            // ===============================================
+                this.dispose(); // Fecha a tela de login atual
                 
             } else {
-                // Se a senha estiver incorreta
                 javax.swing.JOptionPane.showMessageDialog(this, 
                         "Senha incorreta! Tente novamente.", 
                         "Acesso Negado", 
@@ -179,7 +177,6 @@ public class UsuarioView extends javax.swing.JFrame {
             }
 
         } catch (RuntimeException e) {
-            // Trata o caso do .orElseThrow() do Service caso o e-mail não seja localizado no banco
             javax.swing.JOptionPane.showMessageDialog(this, 
                     "Usuário não localizado: " + e.getMessage(), 
                     "Erro de Autenticação", 

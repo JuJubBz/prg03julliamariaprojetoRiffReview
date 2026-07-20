@@ -6,11 +6,14 @@ package br.com.ifba.usuario.entity;
 
 import br.com.ifba.avaliacao.entity.Avaliacao;
 import br.com.ifba.infrastructure.entity.PersistenceEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -44,5 +47,8 @@ public class Usuario extends PersistenceEntity implements Serializable{
     
     @Column(name = "tipo_usuario", nullable = false)
     private String tipoUsuario = "NORMAL";
+    
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Avaliacao> avaliacoes = new ArrayList<>();
     
 }
