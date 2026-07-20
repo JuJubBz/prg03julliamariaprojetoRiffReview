@@ -4,21 +4,146 @@
  */
 package br.com.ifba.album.view;
 
+import br.com.ifba.album.controller.AlbumIController;
+import br.com.ifba.album.entity.Album;
+import br.com.ifba.banda.controller.BandaIController;
+import br.com.ifba.musica.controller.MusicaIController;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.List;
+import javax.swing.JButton;
+import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
+import org.springframework.stereotype.Component;
+import javax.swing.AbstractCellEditor;
+import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
 /**
  *
  * @author Julia Freitas
  */
+
+@Component
 public class AlbumView extends javax.swing.JFrame {
     
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(AlbumView.class.getName());
+    private final AlbumIController albumController;
+    private final BandaIController bandaController;
+    private final MusicaIController musicaController;
+    private final DefaultTableModel tableModel;
 
     /**
      * Creates new form AlbumView
      */
-    public AlbumView() {
+    public AlbumView(AlbumIController albumController, BandaIController bandaController, MusicaIController musicaController) {
+        this.albumController = albumController;
+        this.bandaController = bandaController;
+        this.musicaController = musicaController;
+        
         initComponents();
+        
+        // Pega o modelo das colunas definido no Design (ID, Título, Ano Lançamento, Banda, Deletar, Editar)
+        this.tableModel = (DefaultTableModel) tblAlbuns.getModel();
+        
+        // Configura os botões nas colunas de Ação (Índice 4 = Deletar, Índice 5 = Editar)
+        configurarBotoesTabela();
+         
+        // Carrega as linhas vindas do Supabase
+        carregarAlbuns();
     }
 
+    private void carregarAlbuns() {
+        try {
+            tableModel.setRowCount(0); // Limpa registros antigos
+            List<Album> albuns = albumController.findAll();
+            
+            for (Album a : albuns) {
+                tableModel.addRow(new Object[]{
+                    a.getId(),
+                    a.getNome(),
+                    a.getAnoLancamento(),
+                    a.getBanda() != null ? a.getBanda().getNome() : "Sem Banda",
+                    "", // Espaço reservado para o botão Deletar
+                    ""  // Espaço reservado para o botão Editar
+                });
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Erro ao carregar os álbuns: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    private void configurarBotoesTabela() {
+    // Inicializa o gerenciador para a coluna Deletar (coluna 4)
+    BotaoAcaoTabela acaoDeletar = new BotaoAcaoTabela(tblAlbuns, "🗑️ Deletar", new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            executarDeletar();
+        }
+    });
+    tblAlbuns.getColumnModel().getColumn(4).setCellRenderer((javax.swing.table.TableCellRenderer) acaoDeletar);
+    tblAlbuns.getColumnModel().getColumn(4).setCellEditor((javax.swing.table.TableCellEditor) acaoDeletar);
+
+    // Inicializa o gerenciador para a coluna Editar (coluna 5)
+    BotaoAcaoTabela acaoEditar = new BotaoAcaoTabela(tblAlbuns, "✏️ Editar", new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            executarEditar();
+        }
+    });
+    tblAlbuns.getColumnModel().getColumn(5).setCellRenderer((javax.swing.table.TableCellRenderer) acaoEditar);
+    tblAlbuns.getColumnModel().getColumn(5).setCellEditor((javax.swing.table.TableCellEditor) acaoEditar);
+    }
+    
+    private void executarDeletar() {
+        int linha = tblAlbuns.getEditingRow();
+        if (linha != -1) {
+            Long idAlbum = (Long) tblAlbuns.getValueAt(linha, 0);
+            String nomeAlbum = tblAlbuns.getValueAt(linha, 1).toString();
+
+            int resposta = JOptionPane.showConfirmDialog(
+                this, 
+                "Tem certeza que deseja deletar o álbum \"" + nomeAlbum + "\"?", 
+                "Confirmar Exclusão", 
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE
+            );
+
+            if (resposta == JOptionPane.YES_OPTION) {
+                try {
+                    albumController.delete(idAlbum);
+                    JOptionPane.showMessageDialog(this, "Álbum deletado com sucesso!");
+                    carregarAlbuns(); // Atualiza a tabela instantaneamente
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(this, "Erro ao deletar: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        }
+    }
+    
+    private void executarEditar() {
+        int linha = tblAlbuns.getEditingRow();
+        if (linha != -1) {
+            Long idAlbum = (Long) tblAlbuns.getValueAt(linha, 0);
+            
+            try {
+                // Busca o objeto completo e atualizado no banco
+                Album albumParaEditar = albumController.findById(idAlbum);
+                
+                // Instancia a sua tela AlbumSave passando os controllers necessários
+                AlbumSave telaCadastro = new AlbumSave(albumController, bandaController, musicaController);
+                
+                // TODO: No futuro, você pode criar um método público na sua AlbumSave 
+                // para preencher os campos com os dados desse 'albumParaEditar' (Modo Edição)
+                
+                telaCadastro.setVisible(true);
+                this.dispose(); // Fecha a tela de listagem
+                
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Erro ao abrir edição: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -30,15 +155,15 @@ public class AlbumView extends javax.swing.JFrame {
 
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
-        jButton1 = new javax.swing.JButton();
+        tblAlbuns = new javax.swing.JTable();
+        btnCancelar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jLabel1.setFont(new java.awt.Font("Yu Gothic UI Light", 1, 36)); // NOI18N
         jLabel1.setText("Gerenciamento Albuns");
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tblAlbuns.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null, null},
                 {null, null, null, null, null, null},
@@ -49,11 +174,11 @@ public class AlbumView extends javax.swing.JFrame {
                 "ID", "Título", "Ano Lançamento", "Banda", "Deletar", "Editar"
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(tblAlbuns);
 
-        jButton1.setBackground(new java.awt.Color(255, 153, 153));
-        jButton1.setText("CANCELAR");
-        jButton1.addActionListener(this::jButton1ActionPerformed);
+        btnCancelar.setBackground(new java.awt.Color(255, 153, 153));
+        btnCancelar.setText("CANCELAR");
+        btnCancelar.addActionListener(this::btnCancelarActionPerformed);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -61,7 +186,7 @@ public class AlbumView extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(418, 418, 418)
-                .addComponent(jButton1)
+                .addComponent(btnCancelar)
                 .addGap(0, 0, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(70, Short.MAX_VALUE)
@@ -81,26 +206,21 @@ public class AlbumView extends javax.swing.JFrame {
                 .addGap(54, 54, 54)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(35, 35, 35)
-                .addComponent(jButton1)
+                .addComponent(btnCancelar)
                 .addContainerGap(27, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
+    private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
+        this.dispose();
+    }//GEN-LAST:event_btnCancelarActionPerformed
 
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
+    public static void main(String args[]){ 
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -108,19 +228,61 @@ public class AlbumView extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            System.out.println("Erro ao carregar o visual Nimbus: " + ex.getMessage());
         }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new AlbumView().setVisible(true));
     }
 
+    private static class BotaoAcaoTabela extends AbstractCellEditor implements TableCellRenderer, TableCellEditor {
+        private final JButton botao;
+        private final JTable tabela;
+        private Object valorCelula;
+
+        public BotaoAcaoTabela(JTable tabela, String textoBotao, ActionListener acaoClique) {
+            this.tabela = tabela;
+            this.botao = new JButton(textoBotao);
+            
+            this.botao.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    fireEditingStopped(); // Finaliza a edição da célula de forma segura
+                    acaoClique.actionPerformed(e); // Executa a ação (Deletar ou Editar)
+                }
+            });
+        }
+
+        /*@Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            return botao;
+        }*/
+
+        /*@Override
+        public Component getTableCellEditorComponent(JTable table, Object value, int row, int column) {
+            this.valorCelula = value;
+            return botao;
+        }*/
+
+        @Override
+        public Object getCellEditorValue() {
+            return valorCelula;
+        }
+
+        @Override
+        public java.awt.Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+            return botao;
+        }
+
+        @Override
+        public java.awt.Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            this.valorCelula = value;
+            return botao;
+        }
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton btnCancelar;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTable tblAlbuns;
     // End of variables declaration//GEN-END:variables
 }
