@@ -162,7 +162,7 @@ public class UsuarioView extends javax.swing.JFrame {
                     this.avaliacaoViewAdmin.setVisible(true);            
                 } else {
                     // Se você criou um método similar na visualização comum, chame-o aqui também:
-                    // this.avaliacaoView.inicializarTela(usuarioEncontrado);
+                    this.avaliacaoView.inicializarTela(usuarioEncontrado);
                     this.avaliacaoView.setLocationRelativeTo(null);      
                     this.avaliacaoView.setVisible(true);                 
                 }

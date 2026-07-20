@@ -37,6 +37,9 @@ public class AvaliacaoSave extends javax.swing.JFrame {
     }
 
     public void inicializarTela(Usuario usuario, String contexto, java.util.List<?> itens) {
+        
+        System.out.println("DEBUG - Usuário recebido no AvaliacaoSave: " + usuario);
+        
         this.usuarioLogado = usuario;
         this.contextoAtual = contexto;
         this.listaDeItensOriginais = itens; // Armazena a lista recebida

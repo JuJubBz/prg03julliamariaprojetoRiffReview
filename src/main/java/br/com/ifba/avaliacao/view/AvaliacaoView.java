@@ -4,6 +4,14 @@
  */
 package br.com.ifba.avaliacao.view;
 
+import br.com.ifba.album.controller.AlbumIController;
+import br.com.ifba.album.entity.Album;
+import br.com.ifba.avaliacao.controller.AvaliacaoIController;
+import br.com.ifba.banda.controller.BandaIController;
+import br.com.ifba.banda.entity.Banda;
+import br.com.ifba.musica.controller.MusicaIController;
+import br.com.ifba.musica.entity.Musica;
+import br.com.ifba.usuario.entity.Usuario;
 import org.springframework.stereotype.Component;
 
 /**
@@ -13,15 +21,168 @@ import org.springframework.stereotype.Component;
 @Component
 public class AvaliacaoView extends javax.swing.JFrame {
     
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(AvaliacaoView.class.getName());
+   private final AvaliacaoSave avaliacaoSave;
+    private final AvaliacaoViewSearch avaliacaoViewSearch;
+    private final AvaliacaoIController avaliacaoController;
+    
+    private final BandaIController bandaController;
+    private final AlbumIController albumController;
+    private final MusicaIController musicaController;
+    
+    private Usuario usuarioLogado = null;
 
-    /**
-     * Creates new form AvaliacaoView
-     */
-    public AvaliacaoView() {
+    public AvaliacaoView(AvaliacaoSave avaliacaoSave,
+                         AvaliacaoViewSearch avaliacaoViewSearch,
+                         AvaliacaoIController avaliacaoController,
+                         BandaIController bandaController,
+                         AlbumIController albumController,
+                         MusicaIController musicaController) {
+        
+        this.avaliacaoSave = avaliacaoSave;
+        this.avaliacaoViewSearch = avaliacaoViewSearch;
+        this.avaliacaoController = avaliacaoController;
+        this.bandaController = bandaController;
+        this.albumController = albumController;
+        this.musicaController = musicaController;
+        
         initComponents();
     }
 
+    public void inicializarTela(Usuario usuario) {
+        if (usuario != null) {
+        // ESSA LINHA É A MAIS IMPORTANTE: ela salva o usuário para os botões usarem depois
+        this.usuarioLogado = usuario; 
+        
+        lblBoasVindas.setText("Bem vindo: " + usuario.getNome() + "!");
+    } else {
+        System.out.println("ALERTA: O método inicializarTela recebeu um usuário NULO!");
+    }
+    
+    // Recarrega a tabela com os dados do usuário correto
+    carregarAvaliacoesDoUsuario();
+    }
+    
+    private void carregarAvaliacoesDoUsuario() {
+        
+        try {
+        // Use diretamente a variavel da tabela gerada pelo NetBeans
+        javax.swing.table.DefaultTableModel tableModel = 
+                (javax.swing.table.DefaultTableModel) jTable1.getModel();
+        
+        tableModel.setRowCount(0); 
+        
+        java.util.List<br.com.ifba.avaliacao.entity.Avaliacao> lista = 
+                this.avaliacaoController.findByUsuario(this.usuarioLogado);
+        
+        if (lista != null) {
+            for (br.com.ifba.avaliacao.entity.Avaliacao av : lista) {
+                
+                String tipoAvaliacao = "";
+                String nomeItemAvaliado = "";
+                
+                if (av instanceof br.com.ifba.avaliacao.entity.AvaliacaoBanda) {
+                    tipoAvaliacao = "BANDA";
+                    nomeItemAvaliado = ((br.com.ifba.avaliacao.entity.AvaliacaoBanda) av).getBandaAvaliada().getNome();
+            
+                } else if (av instanceof br.com.ifba.avaliacao.entity.AvaliacaoAlbum) {
+                    tipoAvaliacao = "ÁLBUM";
+                    nomeItemAvaliado = ((br.com.ifba.avaliacao.entity.AvaliacaoAlbum) av).getAlbumAvaliado().getNome();
+            
+                } else if (av instanceof br.com.ifba.avaliacao.entity.AvaliacaoMusica) {
+                    tipoAvaliacao = "MÚSICA";
+                    nomeItemAvaliado = ((br.com.ifba.avaliacao.entity.AvaliacaoMusica) av).getMusicaAvaliada().getTitulo();
+                }
+                
+                // Converte o comentário em HTML para forçar a quebra de linha automática
+                String comentarioFormatado = "<html><body style='width: 250px;'>" + av.getComentario() + "</body></html>";
+                
+                tableModel.addRow(new Object[]{
+                    tipoAvaliacao,         // Coluna 1: Tipo
+                    nomeItemAvaliado,      // Coluna 2: Nome
+                    av.getNota(),          // Coluna 3: Nota
+                    comentarioFormatado    // Coluna 4: Texto (Comentário)
+                });
+            }
+            
+            if (jTable1.getColumnCount() >= 4) {
+                jTable1.getColumnModel().getColumn(3).setPreferredWidth(300);
+            }
+            
+            // Força cada linha a se ajustar à altura do conteúdo textual interno
+            for (int row = 0; row < jTable1.getRowCount(); row++) {
+                int rowHeight = jTable1.getRowHeight();
+                for (int column = 0; column < jTable1.getColumnCount(); column++) {
+                    java.awt.Component comp = jTable1.prepareRenderer(jTable1.getCellRenderer(row, column), row, column);
+                    rowHeight = Math.max(rowHeight, comp.getPreferredSize().height);
+                }
+                jTable1.setRowHeight(row, rowHeight);
+            }
+        }
+    } catch (Exception e) {
+        System.out.println("Erro ao carregar as avaliações do usuário: " + e.getMessage());
+        e.printStackTrace();
+    }
+        
+        /*try {
+            javax.swing.JTable tabela = (javax.swing.JTable) tblAvaliacoes.getViewport().getView();
+            javax.swing.table.DefaultTableModel tableModel = 
+                    (javax.swing.table.DefaultTableModel) tabela.getModel();
+            
+            tableModel.setRowCount(0); 
+            
+            java.util.List<br.com.ifba.avaliacao.entity.Avaliacao> lista = 
+                    this.avaliacaoController.findByUsuario(this.usuarioLogado);
+            
+            if (lista != null) {
+                for (br.com.ifba.avaliacao.entity.Avaliacao av : lista) {
+                    
+                    String tipoAvaliacao = "";
+                    String nomeItemAvaliado = "";
+                    
+                    if (av instanceof br.com.ifba.avaliacao.entity.AvaliacaoBanda) {
+                        tipoAvaliacao = "BANDA";
+                        nomeItemAvaliado = ((br.com.ifba.avaliacao.entity.AvaliacaoBanda) av).getBandaAvaliada().getNome();
+                
+                    } else if (av instanceof br.com.ifba.avaliacao.entity.AvaliacaoAlbum) {
+                        tipoAvaliacao = "ÁLBUM";
+                        nomeItemAvaliado = ((br.com.ifba.avaliacao.entity.AvaliacaoAlbum) av).getAlbumAvaliado().getNome();
+                
+                    } else if (av instanceof br.com.ifba.avaliacao.entity.AvaliacaoMusica) {
+                        tipoAvaliacao = "MÚSICA";
+                        nomeItemAvaliado = ((br.com.ifba.avaliacao.entity.AvaliacaoMusica) av).getMusicaAvaliada().getTitulo();
+                    }
+                    
+                    // Converte o comentário em HTML para forçar a quebra de linha automática
+                    String comentarioFormatado = "<html><body style='width: 250px;'>" + av.getComentario() + "</body></html>";
+                    
+                    tableModel.addRow(new Object[]{
+                        tipoAvaliacao,         // Coluna 1: Tipo
+                        nomeItemAvaliado,      // Coluna 2: Nome
+                        av.getNota(),          // Coluna 3: Nota
+                        comentarioFormatado    // Coluna 4: Texto (Comentário)
+                    });
+                }
+                
+                if (tabela.getColumnCount() >= 4) {
+                    tabela.getColumnModel().getColumn(3).setPreferredWidth(300);
+                }
+                
+                // Força cada linha a se ajustar à altura do conteúdo textual interno
+                for (int row = 0; row < tabela.getRowCount(); row++) {
+                    int rowHeight = tabela.getRowHeight();
+                    for (int column = 0; column < tabela.getColumnCount(); column++) {
+                        java.awt.Component comp = tabela.prepareRenderer(tabela.getCellRenderer(row, column), row, column);
+                        rowHeight = Math.max(rowHeight, comp.getPreferredSize().height);
+                    }
+                    tabela.setRowHeight(row, rowHeight);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Erro ao carregar as avaliações do usuário: " + e.getMessage());
+            e.printStackTrace();
+        }*/
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -44,6 +205,7 @@ public class AvaliacaoView extends javax.swing.JFrame {
         jLabel9 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
         tblAvaliacoes = new javax.swing.JScrollPane();
+        jTable1 = new javax.swing.JTable();
         jLabel4 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -64,6 +226,7 @@ public class AvaliacaoView extends javax.swing.JFrame {
         btnAvaliarBanda.addActionListener(this::btnAvaliarBandaActionPerformed);
 
         btnAvaliarAlbum.setText("+");
+        btnAvaliarAlbum.addActionListener(this::btnAvaliarAlbumActionPerformed);
 
         btnAvaliarMusica.setText("+");
         btnAvaliarMusica.addActionListener(this::btnAvaliarMusicaActionPerformed);
@@ -124,6 +287,19 @@ public class AvaliacaoView extends javax.swing.JFrame {
                 .addGap(41, 41, 41))
         );
 
+        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Tipo", "Nome", "Nota", "Texto"
+            }
+        ));
+        tblAvaliacoes.setViewportView(jTable1);
+
         jLabel4.setFont(new java.awt.Font("Yu Gothic UI Semibold", 1, 14)); // NOI18N
         jLabel4.setText("SUAS AVALIAÇÕES");
 
@@ -174,44 +350,46 @@ public class AvaliacaoView extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnSairActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSairActionPerformed
-        // TODO add your handling code here:
+        this.usuarioLogado = null;
+        this.dispose();
     }//GEN-LAST:event_btnSairActionPerformed
 
     private void btnAvaliarMusicaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAvaliarMusicaActionPerformed
-        // TODO add your handling code here:
+        java.util.List<Musica> musicas = this.musicaController.findAll(); 
+        avaliacaoSave.inicializarTela(this.usuarioLogado, "MUSICA", musicas);
     }//GEN-LAST:event_btnAvaliarMusicaActionPerformed
 
     private void btnAvaliarBandaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAvaliarBandaActionPerformed
-        // TODO add your handling code here:
+        java.util.List<Banda> bandas = this.bandaController.findAll(); 
+        
+        System.out.println("DEBUG - Usuário na View Principal: " + this.usuarioLogado);
+        
+        avaliacaoSave.inicializarTela(this.usuarioLogado, "BANDA", bandas);
     }//GEN-LAST:event_btnAvaliarBandaActionPerformed
 
     private void btnBuscarReviewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarReviewActionPerformed
-        // TODO add your handling code here:
+        this.avaliacaoViewSearch.setVisible(true);
     }//GEN-LAST:event_btnBuscarReviewActionPerformed
+
+    private void btnAvaliarAlbumActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAvaliarAlbumActionPerformed
+        java.util.List<Album> albuns = this.albumController.findAll(); 
+        avaliacaoSave.inicializarTela(this.usuarioLogado, "ALBUM", albuns);
+    }//GEN-LAST:event_btnAvaliarAlbumActionPerformed
 
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
         try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
+        for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+            if ("Nimbus".equals(info.getName())) {
+                javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                break;
             }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
         }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new AvaliacaoView().setVisible(true));
+    } catch (Exception ex) {
+        System.out.println("Erro ao carregar o visual Nimbus: " + ex.getMessage());
+    }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -227,6 +405,7 @@ public class AvaliacaoView extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JTable jTable1;
     private javax.swing.JLabel lblBoasVindas;
     private javax.swing.JScrollPane tblAvaliacoes;
     // End of variables declaration//GEN-END:variables
