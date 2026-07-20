@@ -4,6 +4,16 @@
  */
 package br.com.ifba.avaliacao.view;
 
+import br.com.ifba.album.controller.AlbumIController;
+import br.com.ifba.album.entity.Album;
+import br.com.ifba.avaliacao.controller.AvaliacaoIController;
+import br.com.ifba.banda.controller.BandaIController;
+import br.com.ifba.banda.entity.Banda;
+import br.com.ifba.musica.controller.MusicaIController;
+import br.com.ifba.musica.entity.Musica;
+import br.com.ifba.usuario.entity.Usuario;
+import java.util.List;
+import javax.swing.table.DefaultTableModel;
 import org.springframework.stereotype.Component;
 
 /**
@@ -14,15 +24,55 @@ import org.springframework.stereotype.Component;
 @Component
 public class AvaliacaoViewSearch extends javax.swing.JFrame {
     
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(AvaliacaoViewSearch.class.getName());
+    private final BandaIController bandaController;
+    private final AlbumIController albumController;
+    private final MusicaIController musicaController;
+    private final AvaliacaoIController avaliacaoController;
+    
+    private final AvaliacaoViewDetails avaliacaoViewDetails;
+    
+    private Usuario usuarioLogado = null;
 
     /**
      * Creates new form AvaliacaoSearchView
      */
-    public AvaliacaoViewSearch() {
+    public AvaliacaoViewSearch(BandaIController bandaController,
+                               AlbumIController albumController,
+                               MusicaIController musicaController,
+                               AvaliacaoIController avaliacaoController,
+                               AvaliacaoViewDetails avaliacaoViewDetails) {
+        
+        this.bandaController = bandaController;
+        this.albumController = albumController;
+        this.musicaController = musicaController;
+        this.avaliacaoController = avaliacaoController;
+        this.avaliacaoViewDetails = avaliacaoViewDetails;
+        
         initComponents();
+        
+        // Habilita listener para ativar o botão Detalhes ao selecionar uma linha da tabela
+        tblResultados.getSelectionModel().addListSelectionListener(e -> {
+            btnDetalhes.setEnabled(tblResultados.getSelectedRow() != -1);
+        });
+        
+        btnDetalhes.addActionListener(this::btnDetalhesActionPerformed);
+        
     }
 
+    public void inicializarTela(Usuario usuario) {
+        this.usuarioLogado = usuario;
+        
+        // Limpa campos anteriores ao abrir a tela
+        txtPesquisa.setText("");
+        btnGroupFiltro.clearSelection();
+        
+        DefaultTableModel tableModel = (DefaultTableModel) tblResultados.getModel();
+        tableModel.setRowCount(0);
+        
+        btnDetalhes.setEnabled(false);
+        this.setVisible(true);
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -63,6 +113,7 @@ public class AvaliacaoViewSearch extends javax.swing.JFrame {
 
         btnGroupFiltro.add(rbAlbum);
         rbAlbum.setText("Álbum");
+        rbAlbum.addActionListener(this::rbAlbumActionPerformed);
 
         txtPesquisa.setText("DIGITE O NOME DA BANDA/ÁLBUM/MÚSICA AQUI...");
 
@@ -83,9 +134,9 @@ public class AvaliacaoViewSearch extends javax.swing.JFrame {
         jScrollPane1.setViewportView(tblResultados);
 
         btnVoltar.setText("VOLTAR");
+        btnVoltar.addActionListener(this::btnVoltarActionPerformed);
 
         btnDetalhes.setText("DETALHES");
-        btnDetalhes.setEnabled(false);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -150,40 +201,89 @@ public class AvaliacaoViewSearch extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void rbBandaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbBandaActionPerformed
-        // TODO add your handling code here:
+        txtPesquisa.setText("");
     }//GEN-LAST:event_rbBandaActionPerformed
 
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
-        // TODO add your handling code here:
+        try {
+            DefaultTableModel tableModel = (DefaultTableModel) tblResultados.getModel();
+            tableModel.setRowCount(0);
+            
+            String termoBusca = txtPesquisa.getText().trim();
+            
+            if (rbBanda.isSelected()) {
+                // Adapte para o método real do seu controller (ex: findByNomeContaining ou findAll)
+                List<Banda> bandas = this.bandaController.findAll(); 
+                for (Banda b : bandas) {
+                    if (b.getNome().toLowerCase().contains(termoBusca.toLowerCase())) {
+                        tableModel.addRow(new Object[]{ b.getNome(), b.getGeneroPrincipal() });
+                    }
+                }
+            } else if (rbAlbum.isSelected()) {
+                List<Album> albuns = this.albumController.findAll();
+                for (Album a : albuns) {
+                    if (a.getNome().toLowerCase().contains(termoBusca.toLowerCase())) {
+                        tableModel.addRow(new Object[]{ a.getNome(), a.getBanda() });
+                    }
+                }
+            } else if (rbMusica.isSelected()) {
+                List<Musica> musicas = this.musicaController.findAll();
+                for (Musica m : musicas) {
+                    if (m.getTitulo().toLowerCase().contains(termoBusca.toLowerCase())) {
+                        tableModel.addRow(new Object[]{ m.getTitulo(), m.getGeneroPrincipal() });
+                    }
+                }
+            } else {
+                System.out.println("Nenhum filtro selecionado.");
+            }
+            
+        } catch (Exception e) {
+            System.out.println("Erro ao efetuar busca: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }                                         
+
+
+    private void btnDetalhesActionPerformed(java.awt.event.ActionEvent evt) {                                            
+    int linhaSelecionada = tblResultados.getSelectedRow();
+        if (linhaSelecionada != -1) {
+            String nomeItem = tblResultados.getValueAt(linhaSelecionada, 0).toString();
+        
+            String tipoItem = "";
+            if (rbBanda.isSelected()) tipoItem = "BANDA";
+            else if (rbAlbum.isSelected()) tipoItem = "ALBUM";
+            else if (rbMusica.isSelected()) tipoItem = "MUSICA";
+
+            this.avaliacaoViewDetails.inicializarTela(nomeItem, tipoItem);
+        }
     }//GEN-LAST:event_btnBuscarActionPerformed
 
     private void rbMusicaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbMusicaActionPerformed
-        // TODO add your handling code here:
+        txtPesquisa.setText("");
     }//GEN-LAST:event_rbMusicaActionPerformed
+
+    private void btnVoltarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVoltarActionPerformed
+        this.dispose();
+    }//GEN-LAST:event_btnVoltarActionPerformed
+
+    private void rbAlbumActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbAlbumActionPerformed
+        txtPesquisa.setText("");
+    }//GEN-LAST:event_rbAlbumActionPerformed
 
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
         try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
+        for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+            if ("Nimbus".equals(info.getName())) {
+                javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                break;
             }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
         }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new AvaliacaoViewSearch().setVisible(true));
+    } catch (Exception ex) {
+        System.out.println("Erro ao carregar o visual Nimbus: " + ex.getMessage());
+    }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -4,21 +4,62 @@
  */
 package br.com.ifba.avaliacao.view;
 
+import br.com.ifba.avaliacao.controller.AvaliacaoIController;
+import javax.swing.table.DefaultTableModel;
+import org.springframework.stereotype.Component;
+
 /**
  *
  * @author Julia Freitas
  */
+@Component
 public class AvaliacaoViewDetails extends javax.swing.JFrame {
+    
+    private final AvaliacaoIController avaliacaoController;
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(AvaliacaoViewDetails.class.getName());
 
     /**
      * Creates new form AvaliacaoSearchView
      */
-    public AvaliacaoViewDetails() {
+    public AvaliacaoViewDetails(AvaliacaoIController avaliacaoController) {
+        
+        this.avaliacaoController = avaliacaoController;
         initComponents();
     }
 
+    public void inicializarTela(String nomeItem, String tipoItem) {
+        // 1. Define o texto do JLabel ou JTextField do "Item Selecionado"
+        lblItemSelecionado.setText(nomeItem); 
+        
+        // 2. Limpa a tabela de avaliações dos usuários
+        DefaultTableModel tableModel = (DefaultTableModel) tblResultados.getModel();
+        tableModel.setRowCount(0);
+        
+        try {
+            // 3. Busque as avaliações e a média usando seu avaliacaoController filtrando por nomeItem/tipoItem
+            // Exemplo fictício de preenchimento da tabela:
+            /*
+            double media = avaliacaoController.calcularMedia(nomeItem, tipoItem);
+            lblMediaGeral.setText(String.valueOf(media));
+            
+            List<Avaliacao> avaliacoes = avaliacaoController.findByItem(nomeItem, tipoItem);
+            for (Avaliacao av : avaliacoes) {
+                tableModel.addRow(new Object[]{ av.getUsuario().getNome(), av.getNota(), av.getComentario() });
+            }
+            */
+            
+            // Apenas para testes iniciais:
+            lblMediaGeral.setText("4.5"); 
+            tableModel.addRow(new Object[]{"Usuário Teste", "5", "Excelente trabalho!"});
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        this.setVisible(true);
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -62,6 +103,7 @@ public class AvaliacaoViewDetails extends javax.swing.JFrame {
         jScrollPane1.setViewportView(tblResultados);
 
         btnVoltar.setText("VOLTAR");
+        btnVoltar.addActionListener(this::btnVoltarActionPerformed);
 
         lblItemSelecionado.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         lblItemSelecionado.setText("TEXT");
@@ -131,29 +173,24 @@ public class AvaliacaoViewDetails extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btnVoltarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVoltarActionPerformed
+        this.dispose();
+    }//GEN-LAST:event_btnVoltarActionPerformed
+
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
         try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
+        for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+            if ("Nimbus".equals(info.getName())) {
+                javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                break;
             }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
         }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new AvaliacaoViewDetails().setVisible(true));
+    } catch (Exception ex) {
+        System.out.println("Erro ao carregar o visual Nimbus: " + ex.getMessage());
+    }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
