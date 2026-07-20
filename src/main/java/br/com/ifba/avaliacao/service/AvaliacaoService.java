@@ -6,6 +6,7 @@ package br.com.ifba.avaliacao.service;
 
 import br.com.ifba.avaliacao.entity.Avaliacao;
 import br.com.ifba.avaliacao.repository.AvaliacaoRepository;
+import br.com.ifba.usuario.entity.Usuario;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -124,5 +125,13 @@ public class AvaliacaoService<T extends Avaliacao> implements AvaliacaoIService<
 
     return reviewFormatada;
 }
+    
+    @Override
+    public List<Avaliacao> findByUsuario(Usuario usuario) throws RuntimeException {
+        if (usuario == null) {
+            throw new RuntimeException("O usuário informado para a busca de avaliações é inválido!");
+        }
+        return avaliacaoRepository.findByUsuario(usuario);
+    }
     
 }

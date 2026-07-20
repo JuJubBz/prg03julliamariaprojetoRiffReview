@@ -13,7 +13,9 @@ import jakarta.persistence.OneToMany;
 import java.io.Serializable;
 import java.util.List;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 /**
  *
@@ -23,6 +25,8 @@ import lombok.Setter;
 @Getter
 @Setter
 //@AllArgsConstructor
+@ToString
+@NoArgsConstructor
 public class Banda extends PersistenceEntity implements Serializable {
     
     @Column(name = "nome", nullable = false)
@@ -37,6 +41,7 @@ public class Banda extends PersistenceEntity implements Serializable {
     @OneToMany(mappedBy = "banda")
     private List<Album> albuns;
     
+    //@ToString.Exclude
     @OneToMany(mappedBy = "bandaAvaliada", cascade = jakarta.persistence.CascadeType.ALL, fetch = jakarta.persistence.FetchType.LAZY)
     private List<AvaliacaoBanda> listaAvaliacoes;
 }

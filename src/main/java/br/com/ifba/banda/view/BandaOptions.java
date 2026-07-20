@@ -5,11 +5,13 @@
 package br.com.ifba.banda.view;
 
 import br.com.ifba.album.view.*;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author Julia Freitas
  */
+@Component
 public class BandaOptions extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(BandaOptions.class.getName());
@@ -36,7 +38,7 @@ public class BandaOptions extends javax.swing.JFrame {
         btnVoltar = new javax.swing.JButton();
         lblBoasVindas = new javax.swing.JLabel();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         jLabel1.setFont(new java.awt.Font("Yu Gothic UI Semibold", 1, 36)); // NOI18N
         jLabel1.setText("Controle de Bandas");
@@ -96,7 +98,7 @@ public class BandaOptions extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnVoltarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVoltarActionPerformed
-        // TODO add your handling code here:
+        this.dispose();
     }//GEN-LAST:event_btnVoltarActionPerformed
 
     /**

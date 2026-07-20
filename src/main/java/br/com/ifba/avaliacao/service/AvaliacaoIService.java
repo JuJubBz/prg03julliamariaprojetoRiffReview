@@ -27,4 +27,5 @@ public interface AvaliacaoIService <T extends Avaliacao>{
     List<T> findByUsuarioNome(String Nome) throws RuntimeException;
     List<T> findByDataCriacao(LocalDateTime data) throws RuntimeException;
     String exibirReview(Long id) throws RuntimeException;
+    List<Avaliacao> findByUsuario(Usuario usuario) throws RuntimeException;
 }

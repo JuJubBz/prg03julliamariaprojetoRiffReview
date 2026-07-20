@@ -5,6 +5,7 @@
 package br.com.ifba.avaliacao.repository;
 
 import br.com.ifba.avaliacao.entity.Avaliacao;
+import br.com.ifba.usuario.entity.Usuario;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -22,4 +23,6 @@ public interface AvaliacaoRepository<T extends Avaliacao> extends JpaRepository<
     
     //listar as avaliações criadas em uma data específica
     List<T> findByDataCriacao(LocalDateTime dataCriacao);
+    
+    List<Avaliacao> findByUsuario(Usuario usuario);
 }

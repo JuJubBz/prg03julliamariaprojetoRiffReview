@@ -4,10 +4,20 @@
  */
 package br.com.ifba.avaliacao.view;
 
+import br.com.ifba.album.controller.AlbumIController;
+import br.com.ifba.album.entity.Album;
+import br.com.ifba.album.view.AlbumOptions;
 import br.com.ifba.album.view.AlbumSave;
 import br.com.ifba.album.view.AlbumView;
+import br.com.ifba.avaliacao.controller.AvaliacaoIController;
+import br.com.ifba.banda.controller.BandaIController;
+import br.com.ifba.banda.entity.Banda;
+import br.com.ifba.banda.view.BandaOptions;
 import br.com.ifba.banda.view.BandaSave;
 import br.com.ifba.banda.view.BandaView;
+import br.com.ifba.musica.controller.MusicaIController;
+import br.com.ifba.musica.entity.Musica;
+import br.com.ifba.musica.view.MusicaOptions;
 import br.com.ifba.musica.view.MusicaSave;
 import br.com.ifba.musica.view.MusicaView;
 import br.com.ifba.usuario.entity.Usuario;
@@ -26,60 +36,191 @@ public class AvaliacaoViewAdm extends javax.swing.JFrame {
     
     private final BandaSave bandaSave;
     private final BandaView bandaView;
+    private final BandaOptions bandaOptions; // Adicionado
     
     private final AlbumSave albumSave;
     private final AlbumView albumView;
+    private final AlbumOptions albumOptions; // Adicionado
     
     private final MusicaSave musicaSave;
     private final MusicaView musicaView;
+    private final MusicaOptions musicaOptions; // Adicionado
 
-    // Atributos de controle de estado do Menu e Login
+    private final br.com.ifba.banda.controller.BandaIController bandaController;
+    private final br.com.ifba.album.controller.AlbumIController albumController;
+    private final br.com.ifba.musica.controller.MusicaIController musicaController;
+    
+    private final AvaliacaoViewSearch avaliacaoViewSearch;
+    
+    private final AvaliacaoIController avaliacaoController;
+    
+    // Atributos de controle de estado
     private String contextoAtual = ""; 
     private Usuario usuarioLogado = null;
     
     public AvaliacaoViewAdm(AvaliacaoSave avaliacaoSave,
-            BandaSave bandaSave, BandaView bandaView,
-            AlbumSave albumSave, AlbumView albumView,
-            MusicaSave musicaSave, MusicaView musicaView) {
+            BandaSave bandaSave, BandaView bandaView, BandaOptions bandaOptions,
+            AlbumSave albumSave, AlbumView albumView, AlbumOptions albumOptions,
+            MusicaSave musicaSave, MusicaView musicaView, MusicaOptions musicaOptions,
+            BandaIController bandaController,
+            AlbumIController albumController,
+            MusicaIController musicaController,
+            AvaliacaoViewSearch avaliacaoViewSearch,
+            AvaliacaoIController avaliacaoController) {
         
         this.avaliacaoSave = avaliacaoSave;
         this.bandaSave = bandaSave;
         this.bandaView = bandaView;
+        this.bandaOptions = bandaOptions; 
         this.albumSave = albumSave;
         this.albumView = albumView;
+        this.albumOptions = albumOptions; 
         this.musicaSave = musicaSave;
         this.musicaView = musicaView;
+        this.musicaOptions = musicaOptions; 
+        this.bandaController = bandaController;
+        this.albumController = albumController;
+        this.musicaController = musicaController;
+        this.avaliacaoViewSearch = avaliacaoViewSearch;
+        this.avaliacaoController = avaliacaoController;
         
         initComponents(); // O NetBeans gera isso aqui automático
-        
-        /*menuCadastrar.addActionListener(this::menuCadastrarActionPerformed);
-        menuGerenciar.addActionListener(this::menuGerenciarActionPerformed);
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE)*/
     }
 
+    
+    
     public void inicializarTela(Usuario usuario) {
         if (usuario != null) {
             this.usuarioLogado = usuario;
             lblBoasVindas.setText("Bem vindo ADM: " + usuario.getNome() + "!");
             
-            // Carrega as avaliações específicas apenas deste usuário logado
-            //carregarAvaliacoesDoUsuario();
+            //arrega as avaliações específicas apenas deste usuário logado
+            carregarAvaliacoesDoUsuario();
         }
     }
-    /*
+    
     private void carregarAvaliacoesDoUsuario() {
-    try {
-    // Pega o modelo padrão da tabela "Suas Avaliações"
-    javax.swing.table.DefaultTableModel tableModel =
-    (javax.swing.table.DefaultTableModel) tblAvaliacoes.getModel();
-    tableModel.setRowCount(0); // Limpa registros antigos antes de renderizar
-    // Exemplo fictício puxando do usuário se houver relacionamento mapeado:
-    // if (usuarioLogado.getAvaliacoes() != null) { ... }
+        
+        try {
+            // Obtém a tabela de dentro do painel de rolagem
+            javax.swing.JTable tabela = (javax.swing.JTable) tblAvaliacoes.getViewport().getView();
+            
+            // Pega o modelo usando a própria variável 'tabela' que acabamos de criar
+            javax.swing.table.DefaultTableModel tableModel = 
+                    (javax.swing.table.DefaultTableModel) tabela.getModel();
+            
+            // Limpa os registros antigos da tabela antes de renderizar os novos
+            tableModel.setRowCount(0); 
+            
+            // Busca a lista de avaliações pertencentes estritamente a este usuário
+            java.util.List<br.com.ifba.avaliacao.entity.Avaliacao> lista = 
+                    this.avaliacaoController.findByUsuario(this.usuarioLogado);
+            
+            if (lista != null) {
+                for (br.com.ifba.avaliacao.entity.Avaliacao av : lista) {
+                    
+                    String tipoAvaliacao = "";
+                    String nomeItemAvaliado = "";
+                    
+                    if (av instanceof br.com.ifba.avaliacao.entity.AvaliacaoBanda) {
+                        tipoAvaliacao = "BANDA";
+                        nomeItemAvaliado = ((br.com.ifba.avaliacao.entity.AvaliacaoBanda) av).getBandaAvaliada().getNome();
+                
+                    } else if (av instanceof br.com.ifba.avaliacao.entity.AvaliacaoAlbum) {
+                        tipoAvaliacao = "ÁLBUM";
+                        nomeItemAvaliado = ((br.com.ifba.avaliacao.entity.AvaliacaoAlbum) av).getAlbumAvaliado().getNome();
+                
+                    } else if (av instanceof br.com.ifba.avaliacao.entity.AvaliacaoMusica) {
+                        tipoAvaliacao = "MÚSICA";
+                        nomeItemAvaliado = ((br.com.ifba.avaliacao.entity.AvaliacaoMusica) av).getMusicaAvaliada().getTitulo();
+                    }
+                    
+                    // Converte o comentário em HTML para forçar a quebra de linha automática
+                    String comentarioFormatado = "<html><body style='width: 250px;'>" + av.getComentario() + "</body></html>";
+                    
+                    // Adiciona uma linha contendo as informações da avaliação
+                    tableModel.addRow(new Object[]{
+                        tipoAvaliacao,         // Coluna 1: Tipo
+                        nomeItemAvaliado,      // Coluna 2: Item Avaliado
+                        av.getNota(),          // Coluna 3: Nota
+                        comentarioFormatado    // Coluna 4: Comentário com quebra automática
+                    });
+                }
+                
+                // Define a largura ideal para a coluna de comentário
+                if (tabela.getColumnCount() >= 4) {
+                    tabela.getColumnModel().getColumn(3).setPreferredWidth(300);
+                }
+                
+                // ATUALIZADO AQUI: Força cada linha a se ajustar à altura do conteúdo textual interno
+                for (int row = 0; row < tabela.getRowCount(); row++) {
+                    int rowHeight = tabela.getRowHeight();
+                    for (int column = 0; column < tabela.getColumnCount(); column++) {
+                        java.awt.Component comp = tabela.prepareRenderer(tabela.getCellRenderer(row, column), row, column);
+                        rowHeight = Math.max(rowHeight, comp.getPreferredSize().height);
+                    }
+                    tabela.setRowHeight(row, rowHeight);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Erro ao carregar as avaliações do usuário: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        
+    /*try {
+        // Obtém a tabela de dentro do painel de rolagem
+        javax.swing.JTable tabela = (javax.swing.JTable) tblAvaliacoes.getViewport().getView();
+        
+        // Pega o modelo usando a própria variável 'tabela' que acabamos de criar
+        javax.swing.table.DefaultTableModel tableModel = 
+                (javax.swing.table.DefaultTableModel) tabela.getModel();
+        
+        // Limpa os registros antigos da tabela antes de renderizar os novos
+        tableModel.setRowCount(0); 
+        
+        // Busca a lista de avaliações pertencentes estritamente a este usuário
+        java.util.List<br.com.ifba.avaliacao.entity.Avaliacao> lista = 
+                this.avaliacaoController.findByUsuario(this.usuarioLogado);
+        
+        if (lista != null) {
+            for (br.com.ifba.avaliacao.entity.Avaliacao av : lista) {
+                
+                String tipoAvaliacao = "";
+                String nomeItemAvaliado = "";
+                
+                if (av instanceof br.com.ifba.avaliacao.entity.AvaliacaoBanda) {
+                tipoAvaliacao = "BANDA";
+                nomeItemAvaliado = ((br.com.ifba.avaliacao.entity.AvaliacaoBanda) av).getBandaAvaliada().getNome();
+            
+            } else if (av instanceof br.com.ifba.avaliacao.entity.AvaliacaoAlbum) {
+                tipoAvaliacao = "ÁLBUM";
+                nomeItemAvaliado = ((br.com.ifba.avaliacao.entity.AvaliacaoAlbum) av).getAlbumAvaliado().getNome();
+            
+            } else if (av instanceof br.com.ifba.avaliacao.entity.AvaliacaoMusica) {
+                tipoAvaliacao = "MÚSICA";
+                nomeItemAvaliado = ((br.com.ifba.avaliacao.entity.AvaliacaoMusica) av).getMusicaAvaliada().getTitulo();
+            }
+                
+                // Adiciona uma linha contendo as informações da avaliação
+                tableModel.addRow(new Object[]{
+                    tipoAvaliacao,         // Coluna 1: Tipo
+                    nomeItemAvaliado,      // Coluna 2: Item Avaliado (O que faltava!)
+                    av.getNota(),          // Coluna 3: Nota
+                    av.getComentario()     // Coluna 4: Comentário
+                });
+            }
+            
+            if (tabela.getColumnCount() >= 4) {
+                    tabela.getColumnModel().getColumn(3).setPreferredWidth(300);
+                }
+            
+        }
     } catch (Exception e) {
-    System.out.println("Erro ao carregar as avaliações do usuário: " + e.getMessage());
-    }
-    }
-     */  
+        System.out.println("Erro ao carregar as avaliações do usuário: " + e.getMessage());
+        e.printStackTrace();
+    }*/
+}  
     
     
     
@@ -109,6 +250,7 @@ public class AvaliacaoViewAdm extends javax.swing.JFrame {
         btnEngrenagemAlbum = new javax.swing.JButton();
         btnEngrenagemMusica = new javax.swing.JButton();
         tblAvaliacoes = new javax.swing.JScrollPane();
+        jTable1 = new javax.swing.JTable();
         jLabel4 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -210,6 +352,19 @@ public class AvaliacaoViewAdm extends javax.swing.JFrame {
                 .addGap(29, 29, 29))
         );
 
+        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Tipo", "Item Avaliado", "Nota", "Comentário"
+            }
+        ));
+        tblAvaliacoes.setViewportView(jTable1);
+
         jLabel4.setFont(new java.awt.Font("Yu Gothic UI Semibold", 1, 14)); // NOI18N
         jLabel4.setText("SUAS AVALIAÇÕES");
 
@@ -267,38 +422,63 @@ public class AvaliacaoViewAdm extends javax.swing.JFrame {
     }//GEN-LAST:event_btnSairActionPerformed
 
     private void btnAvaliarMusicaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAvaliarMusicaActionPerformed
-        //avaliacaoSave.preencherContextoFormulario("MUSICA", this.usuarioLogado);
-        avaliacaoSave.setVisible(true);
+        // Busca a lista de músicas através da interface do controller
+        java.util.List<Musica> musicas = this.musicaController.findAll(); 
+        
+        // Abre a tela de avaliações enviando a lista
+        avaliacaoSave.inicializarTela(this.usuarioLogado, "MUSICA", musicas);
     }//GEN-LAST:event_btnAvaliarMusicaActionPerformed
 
     private void btnAvaliarBandaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAvaliarBandaActionPerformed
-        // Envia a informação de contexto para a tela de salvamento de avaliações
-        //avaliacaoSave.preencherContextoFormulario("BANDA", this.usuarioLogado);
-        avaliacaoSave.setVisible(true);
+        /*
+        try {
+        System.out.println("DEBUG: Clicou no botão. Verificando controller: " + (this.bandaController != null));
+        
+        // Busca a lista de bandas através da interface do controller
+        java.util.List<Banda> bandas = this.bandaController.findAll(); 
+        System.out.println("DEBUG: Buscou do banco com sucesso. Quantidade: " + (bandas != null ? bandas.size() : "nulo"));
+        
+        // Abre a tela de avaliações enviando a lista
+        avaliacaoSave.inicializarTela(this.usuarioLogado, "BANDA", bandas);
+        
+    } catch (Exception e) {
+        System.out.println("=== O ERRO ACONTECEU AQUI ===");
+        e.printStackTrace(); // Isso joga o erro detalhado no console em vermelho
+        System.out.println("=============================");
+    }*/
+        
+        /// Busca a lista de bandas através da interface do controller
+        java.util.List<Banda> bandas = this.bandaController.findAll(); 
+        
+        // Abre a tela de avaliações enviando a lista
+        avaliacaoSave.inicializarTela(this.usuarioLogado, "BANDA", bandas);
     }//GEN-LAST:event_btnAvaliarBandaActionPerformed
 
     private void btnBuscarReviewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarReviewActionPerformed
-        // TODO add your handling code here:
+        this.avaliacaoViewSearch.setVisible(true);
     }//GEN-LAST:event_btnBuscarReviewActionPerformed
 
     private void btnEngrenagemBandaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEngrenagemBandaActionPerformed
         this.contextoAtual = "BANDA";
-        //jPopupMenu1.show(btnEngrenagemBanda, 0, btnEngrenagemBanda.getHeight());
+        bandaOptions.setVisible(true); // Abre a tela de opções de Banda;
     }//GEN-LAST:event_btnEngrenagemBandaActionPerformed
 
     private void btnEngrenagemAlbumActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEngrenagemAlbumActionPerformed
         this.contextoAtual = "ALBUM";
-        //jPopupMenu1.show(btnEngrenagemAlbum, 0, btnEngrenagemAlbum.getHeight());
+        albumOptions.setVisible(true); // Abre a tela de opções de Álbum
     }//GEN-LAST:event_btnEngrenagemAlbumActionPerformed
 
     private void btnEngrenagemMusicaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEngrenagemMusicaActionPerformed
         this.contextoAtual = "MUSICA";
-        //jPopupMenu1.show(btnEngrenagemMusica, 0, btnEngrenagemMusica.getHeight());
+        musicaOptions.setVisible(true); // Abre a tela de opções de Música
     }//GEN-LAST:event_btnEngrenagemMusicaActionPerformed
 
     private void btnAvaliarAlbumActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAvaliarAlbumActionPerformed
-        //avaliacaoSave.preencherContextoFormulario("ALBUM", this.usuarioLogado);
-        avaliacaoSave.setVisible(true);
+        // Busca a lista de álbuns através da interface do controller
+        java.util.List<Album> albuns = this.albumController.findAll(); 
+        
+        // Abre a tela de avaliações enviando a lista
+        avaliacaoSave.inicializarTela(this.usuarioLogado, "ALBUM", albuns);
     }//GEN-LAST:event_btnAvaliarAlbumActionPerformed
 
     /**
@@ -333,6 +513,7 @@ public class AvaliacaoViewAdm extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JTable jTable1;
     private javax.swing.JLabel lblBoasVindas;
     private javax.swing.JScrollPane tblAvaliacoes;
     // End of variables declaration//GEN-END:variables

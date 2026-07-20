@@ -4,14 +4,31 @@
  */
 package br.com.ifba.avaliacao.view;
 
+import br.com.ifba.avaliacao.controller.AvaliacaoController;
+import br.com.ifba.usuario.entity.Usuario;
+import java.time.LocalDateTime;
+import javax.swing.JOptionPane;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+//import java.util.logging.Logger;
+//import java.util.logging.Level;
+
 /**
  *
  * @author Julia Freitas
  */
+
+@Component
 public class AvaliacaoSave extends javax.swing.JFrame {
     
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(AvaliacaoSave.class.getName());
-
+    @Autowired
+    private AvaliacaoController avaliacaoController;
+    
+    // Atributos para guardar o estado
+    private Usuario usuarioLogado;
+    private String contextoAtual;
+    private java.util.List<?> listaDeItensOriginais;
+    
     /**
      * Creates new form AvaliacaoSave
      */
@@ -19,6 +36,34 @@ public class AvaliacaoSave extends javax.swing.JFrame {
         initComponents();
     }
 
+    public void inicializarTela(Usuario usuario, String contexto, java.util.List<?> itens) {
+        this.usuarioLogado = usuario;
+        this.contextoAtual = contexto;
+        this.listaDeItensOriginais = itens; // Armazena a lista recebida
+        
+        lblEscolha.setText("Escolha a " + contexto.toLowerCase() + ": ");
+        cbxItemAvaliado.removeAllItems();
+        
+        for (Object item : itens) {
+            if ("BANDA".equals(contexto)) {
+                br.com.ifba.banda.entity.Banda banda = (br.com.ifba.banda.entity.Banda) item;
+                cbxItemAvaliado.addItem(banda.getNome());
+            } else if ("ALBUM".equals(contexto)) {
+                br.com.ifba.album.entity.Album album = (br.com.ifba.album.entity.Album) item;
+                cbxItemAvaliado.addItem(album.getNome()); 
+            } else if ("MUSICA".equals(contexto)) {
+                br.com.ifba.musica.entity.Musica musica = (br.com.ifba.musica.entity.Musica) item;
+                cbxItemAvaliado.addItem(musica.getTitulo());
+            }
+        }
+        
+        // Limpa os campos de texto e spinner para novas inserções
+        txtComentario.setText("");
+        spnNota.setValue(0);
+        
+        this.setVisible(true);
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -36,10 +81,10 @@ public class AvaliacaoSave extends javax.swing.JFrame {
         spnNota = new javax.swing.JSpinner();
         cbxItemAvaliado = new javax.swing.JComboBox<>();
         lblEscolha = new javax.swing.JLabel();
-        btnCancelarr = new javax.swing.JButton();
+        btnCancelar = new javax.swing.JButton();
         btnSalvar = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         jLabel1.setFont(new java.awt.Font("Yu Gothic UI Semibold", 1, 36)); // NOI18N
         jLabel1.setText("Avaliação");
@@ -59,7 +104,7 @@ public class AvaliacaoSave extends javax.swing.JFrame {
         lblEscolha.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         lblEscolha.setText("Escolha: ");
 
-        btnCancelarr.setText("SAIR");
+        btnCancelar.setText("SAIR");
 
         btnSalvar.setText("SALVAR");
         btnSalvar.addActionListener(this::btnSalvarActionPerformed);
@@ -81,7 +126,7 @@ public class AvaliacaoSave extends javax.swing.JFrame {
                                 .addGroup(layout.createSequentialGroup()
                                     .addComponent(btnSalvar)
                                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(btnCancelarr))
+                                    .addComponent(btnCancelar))
                                 .addGroup(layout.createSequentialGroup()
                                     .addComponent(jLabel2)
                                     .addGap(62, 62, 62)
@@ -110,7 +155,7 @@ public class AvaliacaoSave extends javax.swing.JFrame {
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 156, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 42, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnCancelarr)
+                    .addComponent(btnCancelar)
                     .addComponent(btnSalvar))
                 .addGap(26, 26, 26))
         );
@@ -119,38 +164,89 @@ public class AvaliacaoSave extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarActionPerformed
-        // TODO add your handling code here:
+        int indexSelecionado = cbxItemAvaliado.getSelectedIndex();
+        
+        if (indexSelecionado == -1) {
+            JOptionPane.showMessageDialog(this, "Por favor, selecione um item para avaliar.", "Erro", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Captura os dados da interface gráfica
+        // (Fazendo o cast do spinner para Number para aceitar tanto Integer quanto Double com segurança)
+        double nota = ((Number) spnNota.getValue()).doubleValue();
+        String comentario = txtComentario.getText();
+        
+        // Resgata o objeto original correspondente do banco a partir da lista gravada
+        Object itemEscolhido = listaDeItensOriginais.get(indexSelecionado);
+
+        try {
+            if ("BANDA".equals(contextoAtual)) {
+                br.com.ifba.avaliacao.entity.AvaliacaoBanda novaAvaliacao = new br.com.ifba.avaliacao.entity.AvaliacaoBanda();
+                // Vincula os dados comuns herdados de Avaliacao
+                novaAvaliacao.setUsuario(this.usuarioLogado);
+                novaAvaliacao.setNota(nota);
+                novaAvaliacao.setComentario(comentario);
+                novaAvaliacao.setDataCriacao(LocalDateTime.now());
+                
+                // Vincula o relacionamento específico da subclasse
+                novaAvaliacao.setBandaAvaliada((br.com.ifba.banda.entity.Banda) itemEscolhido);
+                
+                // Salva pelo controller
+                avaliacaoController.save(novaAvaliacao);
+                
+            } else if ("ALBUM".equals(contextoAtual)) {
+                br.com.ifba.avaliacao.entity.AvaliacaoAlbum novaAvaliacao = new br.com.ifba.avaliacao.entity.AvaliacaoAlbum();
+                novaAvaliacao.setUsuario(this.usuarioLogado);
+                novaAvaliacao.setNota(nota);
+                novaAvaliacao.setComentario(comentario);
+                novaAvaliacao.setDataCriacao(LocalDateTime.now());
+                
+                novaAvaliacao.setAlbumAvaliado((br.com.ifba.album.entity.Album) itemEscolhido);
+                
+                avaliacaoController.save(novaAvaliacao);
+                
+            } else if ("MUSICA".equals(contextoAtual)) {
+                br.com.ifba.avaliacao.entity.AvaliacaoMusica novaAvaliacao = new br.com.ifba.avaliacao.entity.AvaliacaoMusica();
+                novaAvaliacao.setUsuario(this.usuarioLogado);
+                novaAvaliacao.setNota(nota);
+                novaAvaliacao.setComentario(comentario);
+                novaAvaliacao.setDataCriacao(LocalDateTime.now());
+                
+                novaAvaliacao.setMusicaAvaliada((br.com.ifba.musica.entity.Musica) itemEscolhido);
+                
+                avaliacaoController.save(novaAvaliacao);
+            }
+
+            JOptionPane.showMessageDialog(this, "Avaliação salva com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+            this.dispose(); // Fecha o formulário atual após salvar
+            
+        } catch (Exception e) {
+            System.err.println("Erro ao salvar a avaliação: " + e.getMessage());
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Erro ao tentar salvar avaliação no banco de dados: " + e.getMessage(), "Erro Interno", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btnSalvarActionPerformed
 
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
         try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
+        for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+            if ("Nimbus".equals(info.getName())) {
+                javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                break;
             }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
         }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new AvaliacaoSave().setVisible(true));
+    } catch (Exception ex) {
+        System.out.println("Erro ao carregar o visual Nimbus: " + ex.getMessage());
+    }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnCancelarr;
+    private javax.swing.JButton btnCancelar;
     private javax.swing.JButton btnSalvar;
-    private javax.swing.JComboBox<String> cbxItemAvaliado;
+    private javax.swing.JComboBox<Object> cbxItemAvaliado;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

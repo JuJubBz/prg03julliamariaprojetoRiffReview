@@ -6,6 +6,7 @@ package br.com.ifba.avaliacao.controller;
 
 import br.com.ifba.avaliacao.entity.Avaliacao;
 import br.com.ifba.avaliacao.service.AvaliacaoIService;
+import br.com.ifba.usuario.entity.Usuario;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +58,11 @@ public class AvaliacaoController <T extends Avaliacao> implements AvaliacaoICont
     @Override
     public List<T> findByDataCriacao(LocalDateTime data) throws RuntimeException {
         return avaliacaoService.findByDataCriacao(data);
+    }
+    
+    @Override
+    public List<Avaliacao> findByUsuario(Usuario usuario) throws RuntimeException {
+        return avaliacaoService.findByUsuario(usuario);
     }
     
 }

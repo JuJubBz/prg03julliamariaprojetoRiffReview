@@ -5,6 +5,7 @@
 package br.com.ifba.avaliacao.controller;
 
 import br.com.ifba.avaliacao.entity.Avaliacao;
+import br.com.ifba.usuario.entity.Usuario;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -28,4 +29,6 @@ public interface AvaliacaoIController <T extends Avaliacao> {
     List<T> findByUsuarioNome(String nome) throws RuntimeException;
     
     List<T> findByDataCriacao(LocalDateTime data) throws RuntimeException; 
+    
+    List<Avaliacao> findByUsuario(Usuario usuario) throws RuntimeException;
 }

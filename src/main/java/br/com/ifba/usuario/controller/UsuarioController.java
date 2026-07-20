@@ -55,6 +55,7 @@ public class UsuarioController implements UsuarioIController{
         usuarioService.criarLista(id);
     }
 
+    
    /* @Override
     public void avaliar(Long id, Object avaliacao) throws RuntimeException {
         usuarioService.avaliar(id, avaliacao);

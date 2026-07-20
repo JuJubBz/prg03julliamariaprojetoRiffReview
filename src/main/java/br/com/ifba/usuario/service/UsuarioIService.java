@@ -4,6 +4,7 @@
  */
 package br.com.ifba.usuario.service;
 
+import br.com.ifba.avaliacao.entity.Avaliacao;
 import br.com.ifba.usuario.entity.Usuario;
 import java.util.List;
 
@@ -25,6 +26,8 @@ public interface UsuarioIService {
     
     // Métodos Específicos 
     void criarLista(Long id) throws RuntimeException;
+    
+    
     
     /*void avaliar(Long id, Object avaliacao) throws RuntimeException;
     void exibirPerfil(Long id) throws RuntimeException;*/

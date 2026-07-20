@@ -4,6 +4,7 @@
  */
 package br.com.ifba.usuario.controller;
 
+import br.com.ifba.avaliacao.entity.Avaliacao;
 import br.com.ifba.usuario.entity.Usuario;
 import java.util.List;
 
@@ -23,6 +24,7 @@ public interface UsuarioIController {
     
     // Métodos de Negócio específicos 
     void criarLista(Long id) throws RuntimeException;
+    
     //void avaliar(Long id, Avaliacao avaliacao) throws RuntimeException; 
     //void exibirPerfil(Long id) throws RuntimeException;
     

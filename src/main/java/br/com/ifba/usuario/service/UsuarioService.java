@@ -112,6 +112,7 @@ public class UsuarioService implements UsuarioIService{
         System.out.println("Criando nova lista musical para o usuário: " + usuario.getNome());
     }
 
+    
     /*@Override
     public void avaliar(Long id, Object avaliacao) throws RuntimeException {
         Usuario usuario = this.findById(id);
