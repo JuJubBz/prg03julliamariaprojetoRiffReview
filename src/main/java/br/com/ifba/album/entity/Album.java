@@ -42,9 +42,11 @@ public class Album extends PersistenceEntity implements Serializable{
     @JoinColumn(name = "banda_id", nullable = false)
     private Banda banda;
     
-    @OneToMany(mappedBy = "album")
-    private List<Musica>  musicas;
+    @ToString.Exclude
+    @OneToMany(mappedBy = "album", fetch = jakarta.persistence.FetchType.EAGER) // <--- Mude para EAGER
+    private List<Musica> musicas;
     
+    @ToString.Exclude
     @OneToMany(mappedBy = "albumAvaliado", cascade = jakarta.persistence.CascadeType.ALL, fetch = jakarta.persistence.FetchType.LAZY)
     private List<AvaliacaoAlbum> listaAvaliacoes;
     

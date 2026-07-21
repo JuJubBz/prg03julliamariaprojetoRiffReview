@@ -9,6 +9,7 @@ import br.com.ifba.avaliacao.entity.AvaliacaoBanda;
 import br.com.ifba.infrastructure.entity.PersistenceEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
 import java.io.Serializable;
 import java.util.List;
@@ -38,10 +39,11 @@ public class Banda extends PersistenceEntity implements Serializable {
     @Column(name = "Ano", nullable = false)
     private int anoFormacao;
     
-    @OneToMany(mappedBy = "banda")
+    @ToString.Exclude
+    @OneToMany(mappedBy = "banda", fetch = FetchType.EAGER)
     private List<Album> albuns;
     
-    //@ToString.Exclude
-    @OneToMany(mappedBy = "bandaAvaliada", cascade = jakarta.persistence.CascadeType.ALL, fetch = jakarta.persistence.FetchType.LAZY)
+    @ToString.Exclude
+    @OneToMany(mappedBy = "bandaAvaliada", cascade = jakarta.persistence.CascadeType.ALL, fetch = jakarta.persistence.FetchType.EAGER)
     private List<AvaliacaoBanda> listaAvaliacoes;
 }

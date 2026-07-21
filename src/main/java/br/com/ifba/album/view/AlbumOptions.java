@@ -104,7 +104,13 @@ public class AlbumOptions extends javax.swing.JFrame {
     }//GEN-LAST:event_btnVoltarActionPerformed
 
     private void btnCadastrarAlbumActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCadastrarAlbumActionPerformed
-       albumSave.setVisible(true);
+       try {
+        albumSave.setVisible(true);
+        this.dispose();
+    } catch (Exception e) {
+        e.printStackTrace(); // <--- ISSO VAI MOSTRAR O ERRO REAL NO OUTPUT DO NETBEANS
+        javax.swing.JOptionPane.showMessageDialog(this, "Erro ao abrir tela: " + e.getMessage());
+    }
     }//GEN-LAST:event_btnCadastrarAlbumActionPerformed
 
     private void btnGerenciarAlbunsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGerenciarAlbunsActionPerformed

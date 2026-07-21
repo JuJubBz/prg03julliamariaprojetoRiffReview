@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 import javax.swing.AbstractCellEditor;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
+import org.springframework.beans.factory.annotation.Autowired;
 /**
  *
  * @author Julia Freitas
@@ -32,13 +33,19 @@ public class AlbumView extends javax.swing.JFrame {
     private final MusicaIController musicaController;
     private final DefaultTableModel tableModel;
 
+    
+    private final AlbumSave albumSave;
+   
+    
     /**
      * Creates new form AlbumView
      */
-    public AlbumView(AlbumIController albumController, BandaIController bandaController, MusicaIController musicaController) {
+    @Autowired
+    public AlbumView(AlbumIController albumController, BandaIController bandaController, MusicaIController musicaController, AlbumSave albumSave) {
         this.albumController = albumController;
         this.bandaController = bandaController;
         this.musicaController = musicaController;
+        this.albumSave = albumSave;
         
         initComponents();
         
@@ -73,30 +80,31 @@ public class AlbumView extends javax.swing.JFrame {
     }
     
     private void configurarBotoesTabela() {
-    // Inicializa o gerenciador para a coluna Deletar (coluna 4)
-    BotaoAcaoTabela acaoDeletar = new BotaoAcaoTabela(tblAlbuns, "🗑️ Deletar", new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            executarDeletar();
-        }
-    });
-    tblAlbuns.getColumnModel().getColumn(4).setCellRenderer((javax.swing.table.TableCellRenderer) acaoDeletar);
-    tblAlbuns.getColumnModel().getColumn(4).setCellEditor((javax.swing.table.TableCellEditor) acaoDeletar);
+        BotaoAcaoTabela acaoDeletar = new BotaoAcaoTabela(tblAlbuns, "🗑️ Deletar", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Pega a linha exata que veio do e.getActionCommand()
+                int linha = Integer.parseInt(e.getActionCommand());
+                executarDeletar(linha);
+            }
+        });
+        tblAlbuns.getColumnModel().getColumn(4).setCellRenderer((TableCellRenderer) acaoDeletar);
+        tblAlbuns.getColumnModel().getColumn(4).setCellEditor((TableCellEditor) acaoDeletar);
 
-    // Inicializa o gerenciador para a coluna Editar (coluna 5)
-    BotaoAcaoTabela acaoEditar = new BotaoAcaoTabela(tblAlbuns, "✏️ Editar", new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            executarEditar();
-        }
-    });
-    tblAlbuns.getColumnModel().getColumn(5).setCellRenderer((javax.swing.table.TableCellRenderer) acaoEditar);
-    tblAlbuns.getColumnModel().getColumn(5).setCellEditor((javax.swing.table.TableCellEditor) acaoEditar);
+        BotaoAcaoTabela acaoEditar = new BotaoAcaoTabela(tblAlbuns, "✏️ Editar", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Pega a linha exata que veio do e.getActionCommand()
+                int linha = Integer.parseInt(e.getActionCommand());
+                executarEditar(linha);
+            }
+        });
+        tblAlbuns.getColumnModel().getColumn(5).setCellRenderer((TableCellRenderer) acaoEditar);
+        tblAlbuns.getColumnModel().getColumn(5).setCellEditor((TableCellEditor) acaoEditar);
     }
     
-    private void executarDeletar() {
-        int linha = tblAlbuns.getEditingRow();
-        if (linha != -1) {
+    private void executarDeletar(int linha) {
+        if (linha >= 0 && linha < tblAlbuns.getRowCount()) {
             Long idAlbum = (Long) tblAlbuns.getValueAt(linha, 0);
             String nomeAlbum = tblAlbuns.getValueAt(linha, 1).toString();
 
@@ -120,23 +128,22 @@ public class AlbumView extends javax.swing.JFrame {
         }
     }
     
-    private void executarEditar() {
-        int linha = tblAlbuns.getEditingRow();
-        if (linha != -1) {
+    private void executarEditar(int linha) {
+        if (linha >= 0 && linha < tblAlbuns.getRowCount()) {
             Long idAlbum = (Long) tblAlbuns.getValueAt(linha, 0);
             
             try {
                 // Busca o objeto completo e atualizado no banco
                 Album albumParaEditar = albumController.findById(idAlbum);
                 
-                // Instancia a sua tela AlbumSave passando os controllers necessários
-                AlbumSave telaCadastro = new AlbumSave(albumController, bandaController, musicaController);
-                
-                // TODO: No futuro, você pode criar um método público na sua AlbumSave 
-                // para preencher os campos com os dados desse 'albumParaEditar' (Modo Edição)
-                
-                telaCadastro.setVisible(true);
-                this.dispose(); // Fecha a tela de listagem
+                if (albumParaEditar != null) {
+                    // Prepara os campos e o ID na tela de gravação antes de abri-la
+                    this.albumSave.prepararEdicao(albumParaEditar);
+                    this.albumSave.setVisible(true);
+                    this.dispose(); // Fecha a tela atual de listagem
+                } else {
+                    JOptionPane.showMessageDialog(this, "Álbum não encontrado no sistema.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                }
                 
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(this, "Erro ao abrir edição: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
@@ -237,6 +244,7 @@ public class AlbumView extends javax.swing.JFrame {
         private final JButton botao;
         private final JTable tabela;
         private Object valorCelula;
+        private int linhaAtual = -1; // Guarda o índice da linha clicada
 
         public BotaoAcaoTabela(JTable tabela, String textoBotao, ActionListener acaoClique) {
             this.tabela = tabela;
@@ -245,22 +253,13 @@ public class AlbumView extends javax.swing.JFrame {
             this.botao.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    fireEditingStopped(); // Finaliza a edição da célula de forma segura
-                    acaoClique.actionPerformed(e); // Executa a ação (Deletar ou Editar)
+                    fireEditingStopped();
+                    // Envia o número da linha clicada no ActionEvent
+                    ActionEvent eventoComLinha = new ActionEvent(e.getSource(), e.getID(), String.valueOf(linhaAtual));
+                    acaoClique.actionPerformed(eventoComLinha);
                 }
             });
         }
-
-        /*@Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            return botao;
-        }*/
-
-        /*@Override
-        public Component getTableCellEditorComponent(JTable table, Object value, int row, int column) {
-            this.valorCelula = value;
-            return botao;
-        }*/
 
         @Override
         public Object getCellEditorValue() {
@@ -269,12 +268,13 @@ public class AlbumView extends javax.swing.JFrame {
 
         @Override
         public java.awt.Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+            this.valorCelula = value;
+            this.linhaAtual = row; // Captura a linha no momento da edicao/clique
             return botao;
         }
 
         @Override
         public java.awt.Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            this.valorCelula = value;
             return botao;
         }
     }

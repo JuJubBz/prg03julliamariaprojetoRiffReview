@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
  */
 
 @Service
+@org.springframework.transaction.annotation.Transactional(readOnly = true)
 public class AlbumService implements AlbumIService{
     @Autowired
     private AlbumRepository albumRepository;
@@ -79,6 +80,7 @@ public class AlbumService implements AlbumIService{
     }
 
     @Override
+    @org.springframework.transaction.annotation.Transactional
     public Album findById(Long id) throws RuntimeException {
         if (id == null) {
             throw new RuntimeException("ID fornecido é inválido!");
@@ -88,6 +90,7 @@ public class AlbumService implements AlbumIService{
     }
 
     @Override
+    @org.springframework.transaction.annotation.Transactional
     public List<Album> findByNome(String nome) throws RuntimeException {
         if (nome == null || nome.trim().isEmpty()) {
             throw new RuntimeException("O termo de busca por nome não pode estar vazio!");
@@ -96,6 +99,7 @@ public class AlbumService implements AlbumIService{
     }
 
     @Override
+    @org.springframework.transaction.annotation.Transactional
     public List<Album> findByAnoLancamento(int anoLancamento) throws RuntimeException {
         if (anoLancamento <= 0) {
             throw new RuntimeException("O ano de lançamento fornecido é inválido!");

@@ -50,6 +50,10 @@ public class AlbumSave extends javax.swing.JFrame {
         carregarBandas();
     }
 
+    public void prepararEdicao(Album album) {
+    this.preencherCampos(album);
+    }
+    
     // Método público chamado pela tela de listagem para injetar os dados em modo de edição
     public void preencherCampos(Album album) {
         if (album != null) {
