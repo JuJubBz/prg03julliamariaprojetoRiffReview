@@ -72,22 +72,30 @@ public class AvaliacaoViewDetails extends javax.swing.JFrame {
                 JOptionPane.ERROR_MESSAGE);
         }
 
-        // Atualiza a tabela de avaliações dos usuários
+        // Atualiza a tabela contendo apenas Nota e Avaliação Escrita
         DefaultTableModel model = (DefaultTableModel) tblResultados.getModel();
         model.setRowCount(0); // Limpa as linhas anteriores
 
         if (avaliacoes != null) {
             for (Avaliacao av : avaliacoes) {
                 model.addRow(new Object[]{
-                    av.getUsuario() != null ? av.getUsuario().getNome() : "Anônimo",
                     av.getNota(),
-                    av.getComentario() // Ajuste se a propriedade da mensagem/texto for diferente
+                    av.getComentario()
                 });
             }
         }
     }
     
     public void inicializarTela(String nomeItem, String tipoItem) {
+        lblItemSelecionado.setText(nomeItem); 
+        
+        DefaultTableModel tableModel = (DefaultTableModel) tblResultados.getModel();
+        tableModel.setRowCount(0);
+        
+        this.setVisible(true);
+    }
+    
+    /*public void inicializarTela(String nomeItem, String tipoItem) {
         // 1. Define o texto do JLabel ou JTextField do "Item Selecionado"
         lblItemSelecionado.setText(nomeItem); 
         
@@ -109,7 +117,7 @@ public class AvaliacaoViewDetails extends javax.swing.JFrame {
             */
             
             // Apenas para testes iniciais:
-            lblMediaGeral.setText("4.5"); 
+            /*lblMediaGeral.setText("4.5"); 
             tableModel.addRow(new Object[]{"Usuário Teste", "5", "Excelente trabalho!"});
             
         } catch (Exception e) {
@@ -117,7 +125,7 @@ public class AvaliacaoViewDetails extends javax.swing.JFrame {
         }
 
         this.setVisible(true);
-    }
+    }*/
     
     /**
      * This method is called from within the constructor to initialize the form.
@@ -150,13 +158,13 @@ public class AvaliacaoViewDetails extends javax.swing.JFrame {
 
         tblResultados.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null}
+                {null, null},
+                {null, null},
+                {null, null},
+                {null, null}
             },
             new String [] {
-                "Usuario", "Nota", "Avaliação Escrita"
+                "Nota", "Avaliação Escrita"
             }
         ));
         jScrollPane1.setViewportView(tblResultados);

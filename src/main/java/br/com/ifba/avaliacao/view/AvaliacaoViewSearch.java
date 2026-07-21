@@ -7,6 +7,7 @@ package br.com.ifba.avaliacao.view;
 import br.com.ifba.album.controller.AlbumIController;
 import br.com.ifba.album.entity.Album;
 import br.com.ifba.avaliacao.controller.AvaliacaoIController;
+import br.com.ifba.avaliacao.entity.Avaliacao;
 import br.com.ifba.banda.controller.BandaIController;
 import br.com.ifba.banda.entity.Banda;
 import br.com.ifba.musica.controller.MusicaIController;
@@ -245,7 +246,7 @@ public class AvaliacaoViewSearch extends javax.swing.JFrame {
 
 
     private void btnDetalhesActionPerformed(java.awt.event.ActionEvent evt) {                                            
-    int linhaSelecionada = tblResultados.getSelectedRow();
+    /*int linhaSelecionada = tblResultados.getSelectedRow();
         if (linhaSelecionada != -1) {
             String nomeItem = tblResultados.getValueAt(linhaSelecionada, 0).toString();
         
@@ -255,7 +256,62 @@ public class AvaliacaoViewSearch extends javax.swing.JFrame {
             else if (rbMusica.isSelected()) tipoItem = "MUSICA";
 
             this.avaliacaoViewDetails.inicializarTela(nomeItem, tipoItem);
+        }*/
+    
+    int linhaSelecionada = tblResultados.getSelectedRow();
+    if (linhaSelecionada != -1) {
+        String nomeItem = tblResultados.getValueAt(linhaSelecionada, 0).toString();
+    
+        String tipoItem = "";
+        Long itemId = null;
+
+        if (rbBanda.isSelected()) {
+            tipoItem = "BANDA";
+            List<Banda> bandas = this.bandaController.findAll();
+            for (Banda b : bandas) {
+                if (b.getNome().equalsIgnoreCase(nomeItem)) {
+                    itemId = b.getId();
+                    break;
+                }
+            }
+        } else if (rbAlbum.isSelected()) {
+            tipoItem = "ALBUM";
+            List<Album> albuns = this.albumController.findAll();
+            for (Album a : albuns) {
+                if (a.getNome().equalsIgnoreCase(nomeItem)) {
+                    itemId = a.getId();
+                    break;
+                }
+            }
+        } else if (rbMusica.isSelected()) {
+            tipoItem = "MUSICA";
+            List<Musica> musicas = this.musicaController.findAll();
+            for (Musica m : musicas) {
+                if (m.getTitulo().equalsIgnoreCase(nomeItem)) {
+                    itemId = m.getId();
+                    break;
+                }
+            }
         }
+
+        if (itemId != null) {
+            List<Avaliacao> avaliacoes = null;
+            
+            // Usa o método correto do controller com base no tipo do item selecionado
+            if ("BANDA".equalsIgnoreCase(tipoItem)) {
+                avaliacoes = (List<Avaliacao>) (List<?>) this.avaliacaoController.findByBandaId(itemId);
+            } else if ("ALBUM".equalsIgnoreCase(tipoItem)) {
+                avaliacoes = (List<Avaliacao>) (List<?>) this.avaliacaoController.findByAlbumId(itemId);
+            } else if ("MUSICA".equalsIgnoreCase(tipoItem)) {
+                avaliacoes = (List<Avaliacao>) (List<?>) this.avaliacaoController.findByMusicaId(itemId);
+            }
+            
+            // Abre a tela de detalhes carregando os dados e a média corretamente
+            this.avaliacaoViewDetails.carregarDetalhes(itemId, nomeItem, tipoItem, avaliacoes);
+            this.avaliacaoViewDetails.setVisible(true);
+        }
+    }
+    
     }//GEN-LAST:event_btnBuscarActionPerformed
 
     private void rbMusicaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbMusicaActionPerformed
