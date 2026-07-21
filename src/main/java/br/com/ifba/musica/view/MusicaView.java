@@ -18,6 +18,7 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -32,15 +33,18 @@ public class MusicaView extends javax.swing.JFrame {
     private final BandaIController bandaController;
     private final MusicaIController musicaController;
     private final DefaultTableModel tableModel;
-
+    private final MusicaSave musicaSave;
+    
     /**
      * Creates new form MusicaView
      */
-    public MusicaView(AlbumIController albumController, BandaIController bandaController, MusicaIController musicaController) {
+    @Autowired
+    public MusicaView(AlbumIController albumController, BandaIController bandaController, MusicaIController musicaController, MusicaSave musicaSave) {
         
         this.albumController = albumController;
         this.bandaController = bandaController;
         this.musicaController = musicaController;
+        this.musicaSave = musicaSave;
         
         initComponents();
         
@@ -61,94 +65,90 @@ public class MusicaView extends javax.swing.JFrame {
             List<Musica> musicas = musicaController.findAll();
             
             for (Musica m : musicas) {
-                tableModel.addRow(new Object[]{
-                    m.getId(),
-                    m.getTitulo(),
-                    m.getGeneroPrincipal(),
-                    m.getAlbum() != null ? m.getAlbum().getNome() : "Sem Álbum",
-                    "", // Espaço reservado para o botão Deletar
-                    ""  // Espaço reservado para o botão Editar
-                });
-            }
+            tableModel.addRow(new Object[]{
+                m.getId(),
+                m.getTitulo(),
+                m.getGeneroPrincipal(),
+                m.getDuracao(), // 👈 Adicionado a Duração para alinhar com a tabela
+                m.getAlbum() != null ? m.getAlbum().getNome() : "Sem Álbum",
+                "",
+                ""
+            });
+        }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Erro ao carregar as músicas: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
         }
     }
     
     private void configurarBotoesTabela() {
-        // Inicializa o gerenciador para a coluna Deletar (coluna 4)
-        BotaoAcaoTabela acaoDeletar = new BotaoAcaoTabela(tblMusicas, "🗑️ Deletar", new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                executarDeletar();
-            }
-        });
-        tblMusicas.getColumnModel().getColumn(4).setCellRenderer((javax.swing.table.TableCellRenderer) acaoDeletar);
-        tblMusicas.getColumnModel().getColumn(4).setCellEditor((javax.swing.table.TableCellEditor) acaoDeletar);
+    // Corrigido para colunas 5 e 6, e passando o e.getActionCommand() com o número da linha
+    BotaoAcaoTabela acaoDeletar = new BotaoAcaoTabela(tblMusicas, "🗑️ Deletar", new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            int linha = Integer.parseInt(e.getActionCommand()); // 👈 Pega a linha exata
+            executarDeletar(linha); // 👈 Passa a linha tratada
+        }
+    });
+    tblMusicas.getColumnModel().getColumn(5).setCellRenderer((TableCellRenderer) acaoDeletar);
+    tblMusicas.getColumnModel().getColumn(5).setCellEditor((TableCellEditor) acaoDeletar);
 
-        // Inicializa o gerenciador para a coluna Editar (coluna 5)
-        BotaoAcaoTabela acaoEditar = new BotaoAcaoTabela(tblMusicas, "✏️ Editar", new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                executarEditar();
-            }
-        });
-        tblMusicas.getColumnModel().getColumn(5).setCellRenderer((javax.swing.table.TableCellRenderer) acaoEditar);
-        tblMusicas.getColumnModel().getColumn(5).setCellEditor((javax.swing.table.TableCellEditor) acaoEditar);
-    }
+    BotaoAcaoTabela acaoEditar = new BotaoAcaoTabela(tblMusicas, "✏️ Editar", new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            int linha = Integer.parseInt(e.getActionCommand()); // 👈 Pega a linha exata
+            executarEditar(linha); // 👈 Passa a linha tratada
+        }
+    });
+    tblMusicas.getColumnModel().getColumn(6).setCellRenderer((TableCellRenderer) acaoEditar);
+    tblMusicas.getColumnModel().getColumn(6).setCellEditor((TableCellEditor) acaoEditar);
+}
     
-    private void executarDeletar() {
-        int linha = tblMusicas.getEditingRow();
-        if (linha != -1) {
-            Long idMusica = (Long) tblMusicas.getValueAt(linha, 0);
-            String tituloMusica = tblMusicas.getValueAt(linha, 1).toString();
+    private void executarDeletar(int linha) {
+    if (linha >= 0 && linha < tblMusicas.getRowCount()) {
+        Long idMusica = (Long) tblMusicas.getValueAt(linha, 0);
+        String tituloMusica = tblMusicas.getValueAt(linha, 1).toString();
 
-            int resposta = JOptionPane.showConfirmDialog(
-                this, 
-                "Tem certeza que deseja deletar a música \"" + tituloMusica + "\"?", 
-                "Confirmar Exclusão", 
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.WARNING_MESSAGE
-            );
+        int resposta = JOptionPane.showConfirmDialog(
+            this, 
+            "Tem certeza que deseja deletar a música \"" + tituloMusica + "\"?", 
+            "Confirmar Exclusão", 
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.WARNING_MESSAGE
+        );
 
-            if (resposta == JOptionPane.YES_OPTION) {
-                try {
-                    musicaController.delete(idMusica); // Se seu controller usar deleteById, altere aqui
-                    JOptionPane.showMessageDialog(this, "Música deletada com sucesso!");
-                    carregarMusicas(); // Atualiza a tabela instantaneamente
-                } catch (Exception e) {
-                    JOptionPane.showMessageDialog(this, "Erro ao deletar: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
-                }
+        if (resposta == JOptionPane.YES_OPTION) {
+            try {
+                musicaController.delete(idMusica); // Altere para deleteById caso o seu controller use esse nome
+                JOptionPane.showMessageDialog(this, "Música deletada com sucesso!");
+                carregarMusicas(); // Atualiza a tabela instantaneamente
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Erro ao deletar: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
+}
     
-    private void executarEditar() {
-        int linha = tblMusicas.getEditingRow();
-    if (linha != -1) {
+    private void executarEditar(int linha) {
+    if (linha >= 0 && linha < tblMusicas.getRowCount()) {
         Long idMusica = (Long) tblMusicas.getValueAt(linha, 0);
-        
+
         try {
-            // 1. Busca a música completa vinda do banco usando o ID da linha selecionada
-            Musica musicaParaEditar = musicaController.findById(idMusica); // Mude para findById se for o padrão do seu controller
-            
+            // 1. Busca a música completa no banco pelo ID da linha
+            Musica musicaParaEditar = this.musicaController.findById(idMusica);
+
             if (musicaParaEditar != null) {
-                // 2. Cria ou abre a instância da tela de salvar enviando o controller
-                MusicaSave telaCadastro = new MusicaSave(musicaController);
-                
-                // 3. Alimenta o formulário com a música que acabamos de buscar
-                telaCadastro.prepararEdicao(musicaParaEditar);
-                
-                // 4. Exibe a interface para o usuário alterar
-                telaCadastro.setVisible(true);
-                this.dispose(); // Fecha a tela de listagem se desejar
+                // 2. Prepara e exibe a tela de cadastro gerenciada pelo Spring
+                this.musicaSave.prepararEdicao(musicaParaEditar);
+                this.musicaSave.setVisible(true);
+                this.dispose(); // Fecha a tela de listagem
+            } else {
+                JOptionPane.showMessageDialog(this, "Música não encontrada no sistema.", "Aviso", JOptionPane.WARNING_MESSAGE);
             }
-            
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Erro ao abrir edição: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
         }
     }
-    }
+}
     
     /**
      * This method is called from within the constructor to initialize the form.
@@ -239,33 +239,44 @@ public class MusicaView extends javax.swing.JFrame {
     }
     
     private static class BotaoAcaoTabela extends AbstractCellEditor implements TableCellRenderer, TableCellEditor {
-        private final JButton botao;
-        private final JTable tabela;
-        private Object valorCelula;
+    private final JButton botao;
+    private final JTable tabela;
+    private Object valorCelula;
+    private int linhaAtual = -1; // 👈Guardará o índice da linha
 
-        public BotaoAcaoTabela(JTable tabela, String textoBotao, ActionListener acaoClique) {
-            this.tabela = tabela;
-            this.botao = new JButton(textoBotao);
-            
-            this.botao.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    fireEditingStopped();
-                    acaoClique.actionPerformed(e);
-                }
-            });
-        }
+    public BotaoAcaoTabela(JTable tabela, String textoBotao, ActionListener acaoClique) {
+        this.tabela = tabela;
+        this.botao = new JButton(textoBotao);
+
+        this.botao.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                fireEditingStopped();
+                // Empacota o índice da linha dentro do comando da ação
+                ActionEvent eventoComLinha = new ActionEvent(e.getSource(), e.getID(), String.valueOf(linhaAtual));
+                acaoClique.actionPerformed(eventoComLinha);
+            }
+        });
+    }
+
+    @Override
+    public java.awt.Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+        this.valorCelula = value;
+        this.linhaAtual = row; //  Captura a linha no momento do clique/edição
+        return botao;
+    }
 
         @Override
         public Object getCellEditorValue() {
             return valorCelula;
         }
-
+        
+        /*
         @Override
         public java.awt.Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
             this.valorCelula = value;
             return botao;
-        }
+        }*/
 
         @Override
         public java.awt.Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {

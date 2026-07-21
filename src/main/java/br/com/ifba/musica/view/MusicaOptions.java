@@ -5,6 +5,7 @@
 package br.com.ifba.musica.view;
 
 import br.com.ifba.album.view.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -14,12 +15,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class MusicaOptions extends javax.swing.JFrame {
     
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(MusicaOptions.class.getName());
+    private final MusicaSave musicaSave;
+    private final MusicaView musicaView;
 
-    /**
-     * Creates new form AlbumOptions
-     */
-    public MusicaOptions() {
+    @Autowired
+    public MusicaOptions(MusicaSave musicaSave, MusicaView musicaView) {
+        this.musicaSave = musicaSave;
+        this.musicaView = musicaView;
         initComponents();
     }
 
@@ -44,6 +46,7 @@ public class MusicaOptions extends javax.swing.JFrame {
         jLabel1.setText("Controle de Músicas");
 
         btnCadastrarMusica.setText("CADASTRAR");
+        btnCadastrarMusica.addActionListener(this::btnCadastrarMusicaActionPerformed);
 
         btnGerenciarMusicas.setText("GERENCIAR");
         btnGerenciarMusicas.addActionListener(this::btnGerenciarMusicasActionPerformed);
@@ -103,18 +106,17 @@ public class MusicaOptions extends javax.swing.JFrame {
     }//GEN-LAST:event_btnVoltarActionPerformed
 
     private void btnGerenciarMusicasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGerenciarMusicasActionPerformed
-        // TODO add your handling code here:
+        musicaView.setVisible(true);
     }//GEN-LAST:event_btnGerenciarMusicasActionPerformed
+
+    private void btnCadastrarMusicaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCadastrarMusicaActionPerformed
+        musicaSave.setVisible(true);
+    }//GEN-LAST:event_btnCadastrarMusicaActionPerformed
 
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -122,13 +124,9 @@ public class MusicaOptions extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            System.out.println("Erro ao carregar o visual Nimbus: " + ex.getMessage());
         }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new MusicaOptions().setVisible(true));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

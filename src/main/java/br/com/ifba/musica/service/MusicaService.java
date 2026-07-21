@@ -33,10 +33,9 @@ public class MusicaService implements MusicaIService{
             throw new RuntimeException("Dados da música não preenchidos!");
         }
         
-        // Validação 2: Se já tem ID no banco de dados (Assumindo id herdado da classe mãe)
-        if (musica.getId() != 0 ) {
-            throw new RuntimeException("Música já existente no Banco de dados!");
-        } else {
+        // Validação 2: Se já tem ID, é uma edição e não deve ser salvo via save()
+        if (musica.getId() != 0) {
+            throw new RuntimeException("Música já existente no Banco de dados! Utilize o método de atualização.");
         }
         
         // Validação 3: Validação de campos obrigatórios

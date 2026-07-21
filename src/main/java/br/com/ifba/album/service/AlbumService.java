@@ -33,11 +33,6 @@ public class AlbumService implements AlbumIService{
             throw new RuntimeException("Dados do álbum não preenchidos!");
         }
         
-        // Validação 2: Checagem do ID do tipo primitivo 'long' herdado da PersistenceEntity
-        if (album.getId() != 0) {
-            throw new RuntimeException("Álbum já existente no Banco de dados!");
-        }
-        
         // Validação de Negócio: O nome do álbum é obrigatório conforme o UML
         if (album.getNome() == null || album.getNome().trim().isEmpty()) {
             throw new RuntimeException("O nome do álbum é obrigatório!");
@@ -48,6 +43,7 @@ public class AlbumService implements AlbumIService{
             throw new RuntimeException("O ano de lançamento informado é inválido!");
         }
 
+        // O Spring Data JPA cria (INSERT) se não houver ID e atualiza (UPDATE) se o ID já existir
         return albumRepository.save(album);
     }
 

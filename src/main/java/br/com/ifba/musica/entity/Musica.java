@@ -44,7 +44,7 @@ public class Musica extends PersistenceEntity implements Serializable{
     private String duracao;
     
     @ManyToOne
-    @JoinColumn(name = "Album_Id", nullable = false)
+    @JoinColumn(name = "Album_Id", nullable = true)
     private Album album;
     
     @OneToMany(mappedBy = "musicaAvaliada", cascade = jakarta.persistence.CascadeType.ALL, fetch = jakarta.persistence.FetchType.LAZY)
