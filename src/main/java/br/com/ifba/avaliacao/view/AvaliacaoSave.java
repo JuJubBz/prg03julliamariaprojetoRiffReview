@@ -84,7 +84,7 @@ public class AvaliacaoSave extends javax.swing.JFrame {
         txtComentario.setText("");
         spnNota.setValue(0);
         
-        this.setVisible(true);
+        //this.setVisible(true);
     }
     
     /**
@@ -128,6 +128,7 @@ public class AvaliacaoSave extends javax.swing.JFrame {
         lblEscolha.setText("Escolha: ");
 
         btnCancelar.setText("SAIR");
+        btnCancelar.addActionListener(this::btnCancelarActionPerformed);
 
         btnSalvar.setText("SALVAR");
         btnSalvar.addActionListener(this::btnSalvarActionPerformed);
@@ -235,6 +236,9 @@ public class AvaliacaoSave extends javax.swing.JFrame {
 
             JOptionPane.showMessageDialog(this, "Avaliação salva com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
             this.dispose();
+            if (this.telaAnterior != null) {
+                this.telaAnterior.setVisible(true); // Faz a tela pai/menu reaparecer ao voltar
+            }
 
         } catch (Exception e) {
             System.err.println("Erro ao salvar a avaliação: " + e.getMessage());
@@ -242,6 +246,13 @@ public class AvaliacaoSave extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Erro ao tentar salvar avaliação no banco de dados: " + e.getMessage(), "Erro Interno", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnSalvarActionPerformed
+
+    private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
+        this.dispose();
+        if (this.telaAnterior != null) {
+            this.telaAnterior.setVisible(true); // Faz a tela pai/menu reaparecer ao voltar
+        }
+    }//GEN-LAST:event_btnCancelarActionPerformed
 
     /**
      * @param args the command line arguments

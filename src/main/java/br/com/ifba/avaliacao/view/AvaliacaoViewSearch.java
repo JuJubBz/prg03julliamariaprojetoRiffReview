@@ -32,6 +32,8 @@ public class AvaliacaoViewSearch extends javax.swing.JFrame {
     
     private final AvaliacaoViewDetails avaliacaoViewDetails;
     
+    private javax.swing.JFrame telaAnterior;
+    
     private Usuario usuarioLogado = null;
 
     /**
@@ -60,6 +62,15 @@ public class AvaliacaoViewSearch extends javax.swing.JFrame {
         
     }
 
+    public void abrirTela(javax.swing.JFrame telaAnterior) {
+    this.telaAnterior = telaAnterior;
+        if (this.telaAnterior != null) {
+            this.telaAnterior.setVisible(false);
+        }
+        this.setLocationRelativeTo(null);
+        this.setVisible(true);
+    }
+    
     public void inicializarTela(Usuario usuario) {
         this.usuarioLogado = usuario;
         
@@ -308,7 +319,10 @@ public class AvaliacaoViewSearch extends javax.swing.JFrame {
             
             // Abre a tela de detalhes carregando os dados e a média corretamente
             this.avaliacaoViewDetails.carregarDetalhes(itemId, nomeItem, tipoItem, avaliacoes);
-            this.avaliacaoViewDetails.setVisible(true);
+            
+            avaliacaoViewDetails.abrirTela(this);  
+            
+            //this.avaliacaoViewDetails.setVisible(true);
         }
     }
     
@@ -320,6 +334,9 @@ public class AvaliacaoViewSearch extends javax.swing.JFrame {
 
     private void btnVoltarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVoltarActionPerformed
         this.dispose();
+        if (this.telaAnterior != null) {
+            this.telaAnterior.setVisible(true); // Faz a tela pai/menu reaparecer ao voltar
+        }
     }//GEN-LAST:event_btnVoltarActionPerformed
 
     private void rbAlbumActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbAlbumActionPerformed

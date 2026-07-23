@@ -144,8 +144,7 @@ public class BandaView extends javax.swing.JFrame {
 
                 if (bandaParaEditar != null) {
                     this.bandaSave.prepararEdicao(bandaParaEditar);
-                    this.bandaSave.setVisible(true);
-                    this.dispose(); 
+                    bandaSave.abrirTela(this); 
                 } else {
                     JOptionPane.showMessageDialog(this, "Banda não encontrada no sistema.", "Aviso", JOptionPane.WARNING_MESSAGE);
                 }

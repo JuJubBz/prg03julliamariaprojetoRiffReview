@@ -148,7 +148,7 @@ public class AlbumView extends javax.swing.JFrame {
                 if (albumParaEditar != null) {
                     // Prepara os campos e o ID na tela de gravação antes de abri-la
                     this.albumSave.prepararEdicao(albumParaEditar);
-                    this.albumSave.setVisible(true);
+                    albumSave.abrirTela(this);
                     this.dispose(); // Fecha a tela atual de listagem
                 } else {
                     JOptionPane.showMessageDialog(this, "Álbum não encontrado no sistema.", "Aviso", JOptionPane.WARNING_MESSAGE);

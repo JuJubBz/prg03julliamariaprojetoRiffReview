@@ -152,7 +152,7 @@ public class MusicaView extends javax.swing.JFrame {
                 // 2. Prepara e exibe a tela de cadastro gerenciada pelo Spring
                 this.musicaSave.prepararEdicao(musicaParaEditar);
                 this.musicaSave.setAoSalvar(() -> carregarMusicas());
-                this.musicaSave.setVisible(true);
+                musicaSave.abrirTela(this);
                 this.dispose(); // Fecha a tela de listagem
             } else {
                 JOptionPane.showMessageDialog(this, "Música não encontrada no sistema.", "Aviso", JOptionPane.WARNING_MESSAGE);

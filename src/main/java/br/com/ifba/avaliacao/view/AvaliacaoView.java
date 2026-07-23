@@ -357,6 +357,7 @@ public class AvaliacaoView extends javax.swing.JFrame {
     private void btnAvaliarMusicaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAvaliarMusicaActionPerformed
         java.util.List<Musica> musicas = this.musicaController.findAll(); 
         avaliacaoSave.inicializarTela(this.usuarioLogado, "MUSICA", musicas);
+        avaliacaoSave.abrirTela(this); 
     }//GEN-LAST:event_btnAvaliarMusicaActionPerformed
 
     private void btnAvaliarBandaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAvaliarBandaActionPerformed
@@ -365,15 +366,18 @@ public class AvaliacaoView extends javax.swing.JFrame {
         System.out.println("DEBUG - Usuário na View Principal: " + this.usuarioLogado);
         
         avaliacaoSave.inicializarTela(this.usuarioLogado, "BANDA", bandas);
+        
+        avaliacaoSave.abrirTela(this);
     }//GEN-LAST:event_btnAvaliarBandaActionPerformed
 
     private void btnBuscarReviewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarReviewActionPerformed
-        this.avaliacaoViewSearch.setVisible(true);
+        avaliacaoViewSearch.abrirTela(this);  
     }//GEN-LAST:event_btnBuscarReviewActionPerformed
 
     private void btnAvaliarAlbumActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAvaliarAlbumActionPerformed
         java.util.List<Album> albuns = this.albumController.findAll(); 
         avaliacaoSave.inicializarTela(this.usuarioLogado, "ALBUM", albuns);
+        avaliacaoSave.abrirTela(this); 
     }//GEN-LAST:event_btnAvaliarAlbumActionPerformed
 
     /**

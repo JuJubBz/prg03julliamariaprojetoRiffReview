@@ -26,6 +26,8 @@ public class AvaliacaoViewDetails extends javax.swing.JFrame {
     private final AlbumIController albumController;
     private final MusicaIController musicaController;
 
+    private javax.swing.JFrame telaAnterior;
+    
     @Autowired
     public AvaliacaoViewDetails(BandaIController bandaController, 
                                 AlbumIController albumController, 
@@ -40,6 +42,15 @@ public class AvaliacaoViewDetails extends javax.swing.JFrame {
         btnVoltar.addActionListener(e -> this.dispose());
     }
 
+    public void abrirTela(javax.swing.JFrame telaAnterior) {
+    this.telaAnterior = telaAnterior;
+        if (this.telaAnterior != null) {
+            this.telaAnterior.setVisible(false);
+        }
+        this.setLocationRelativeTo(null);
+        this.setVisible(true);
+    }
+    
     public void carregarDetalhes(Long itemId, String nomeItem, String tipoItem, List<Avaliacao> avaliacoes) {
         lblItemSelecionado.setText(nomeItem);
         
@@ -242,6 +253,9 @@ public class AvaliacaoViewDetails extends javax.swing.JFrame {
 
     private void btnVoltarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVoltarActionPerformed
         this.dispose();
+        if (this.telaAnterior != null) {
+            this.telaAnterior.setVisible(true); // Faz a tela pai/menu reaparecer ao voltar
+        }
     }//GEN-LAST:event_btnVoltarActionPerformed
 
     /**

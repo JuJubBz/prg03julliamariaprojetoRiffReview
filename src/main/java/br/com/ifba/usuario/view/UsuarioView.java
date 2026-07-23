@@ -37,6 +37,7 @@ public class UsuarioView extends javax.swing.JFrame {
         this.avaliacaoViewAdmin = avaliacaoViewAdmin;
         
         initComponents();
+        this.getRootPane().setDefaultButton(btnEntrar);
     }
 
     /**
@@ -204,7 +205,7 @@ public class UsuarioView extends javax.swing.JFrame {
     }//GEN-LAST:event_btnCadastrarActionPerformed
 
     private void txtSenhaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSenhaActionPerformed
-        // TODO add your handling code here:
+        btnEntrar.doClick();
     }//GEN-LAST:event_txtSenhaActionPerformed
 
     /**

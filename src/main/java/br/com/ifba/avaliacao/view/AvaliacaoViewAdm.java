@@ -430,6 +430,8 @@ public class AvaliacaoViewAdm extends javax.swing.JFrame {
         
         // Abre a tela de avaliações enviando a lista
         avaliacaoSave.inicializarTela(this.usuarioLogado, "MUSICA", musicas);
+        
+        avaliacaoSave.abrirTela(this); 
     }//GEN-LAST:event_btnAvaliarMusicaActionPerformed
 
     private void btnAvaliarBandaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAvaliarBandaActionPerformed
@@ -455,10 +457,13 @@ public class AvaliacaoViewAdm extends javax.swing.JFrame {
         
         // Abre a tela de avaliações enviando a lista
         avaliacaoSave.inicializarTela(this.usuarioLogado, "BANDA", bandas);
+        
+        avaliacaoSave.abrirTela(this); 
     }//GEN-LAST:event_btnAvaliarBandaActionPerformed
 
     private void btnBuscarReviewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarReviewActionPerformed
-        this.avaliacaoViewSearch.setVisible(true);
+        avaliacaoViewSearch.abrirTela(this);  
+        //this.avaliacaoViewSearch.setVisible(true);
     }//GEN-LAST:event_btnBuscarReviewActionPerformed
 
     private void btnEngrenagemBandaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEngrenagemBandaActionPerformed
@@ -486,6 +491,8 @@ public class AvaliacaoViewAdm extends javax.swing.JFrame {
         
         // Abre a tela de avaliações enviando a lista
         avaliacaoSave.inicializarTela(this.usuarioLogado, "ALBUM", albuns);
+        
+        avaliacaoSave.abrirTela(this); 
     }//GEN-LAST:event_btnAvaliarAlbumActionPerformed
 
     /**
