@@ -38,6 +38,8 @@ public class AvaliacaoSave extends javax.swing.JFrame {
     private String contextoAtual;
     private java.util.List<?> listaDeItensOriginais;
     
+    //tela anterior
+    private javax.swing.JFrame telaAnterior;
     /**
      * Creates new form AvaliacaoSave
      */
@@ -45,6 +47,15 @@ public class AvaliacaoSave extends javax.swing.JFrame {
         initComponents();
     }
 
+    public void abrirTela(javax.swing.JFrame telaAnterior) {
+    this.telaAnterior = telaAnterior;
+        if (this.telaAnterior != null) {
+            this.telaAnterior.setVisible(false);
+        }
+        this.setLocationRelativeTo(null);
+        this.setVisible(true);
+    }
+    
     public void inicializarTela(Usuario usuario, String contexto, java.util.List<?> itens) {
         
         System.out.println("DEBUG - Usuário recebido no AvaliacaoSave: " + usuario);

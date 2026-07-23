@@ -32,10 +32,19 @@ public class AlbumView extends javax.swing.JFrame {
     private final BandaIController bandaController;
     private final MusicaIController musicaController;
     private final DefaultTableModel tableModel;
-
+    
     
     private final AlbumSave albumSave;
-   
+    private javax.swing.JFrame telaAnterior;
+    
+    public void abrirTela(javax.swing.JFrame telaAnterior) {
+    this.telaAnterior = telaAnterior;
+        if (this.telaAnterior != null) {
+            this.telaAnterior.setVisible(false);
+        }
+        this.setLocationRelativeTo(null);
+        this.setVisible(true);
+    }
     
     /**
      * Creates new form AlbumView
@@ -222,6 +231,9 @@ public class AlbumView extends javax.swing.JFrame {
 
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
         this.dispose();
+        if (this.telaAnterior != null) {
+            this.telaAnterior.setVisible(true); // Reexibe a janela pai ao voltar
+        }
     }//GEN-LAST:event_btnCancelarActionPerformed
 
     /**

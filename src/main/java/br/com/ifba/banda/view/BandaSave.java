@@ -200,6 +200,11 @@ public class BandaSave extends javax.swing.JFrame {
                 limparCampos();
             }
             
+            this.dispose();
+            if (this.telaAnterior != null) {
+                this.telaAnterior.setVisible(true); // Reexibe a janela pai ao voltar
+            }
+            
         } catch (Exception e) {
             javax.swing.JOptionPane.showMessageDialog(this, 
                     "Erro ao salvar a banda: " + e.getMessage(), 

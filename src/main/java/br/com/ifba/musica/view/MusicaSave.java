@@ -23,13 +23,13 @@ public class MusicaSave extends javax.swing.JFrame {
     
     
     public void abrirTela(javax.swing.JFrame telaAnterior) {
-    this.telaAnterior = telaAnterior;
-    if (this.telaAnterior != null) {
-        this.telaAnterior.setVisible(false); // Esconde a janela anterior
+        this.telaAnterior = telaAnterior;
+        if (this.telaAnterior != null) {
+            this.telaAnterior.setVisible(false); // Esconde a janela anterior
+        }
+        this.setLocationRelativeTo(null);
+        this.setVisible(true);
     }
-    this.setLocationRelativeTo(null);
-    this.setVisible(true);
-}
     /**
      * Creates new form AlbumSave
      */
@@ -208,6 +208,11 @@ public class MusicaSave extends javax.swing.JFrame {
             }
         } else {
             limparCampos();
+        }
+        
+        this.dispose();
+        if (this.telaAnterior != null) {
+            this.telaAnterior.setVisible(true); // Reexibe a janela pai ao voltar
         }
         
     } catch (Exception e) {

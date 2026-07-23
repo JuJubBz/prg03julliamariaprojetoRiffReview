@@ -16,7 +16,17 @@ public class AlbumOptions extends javax.swing.JFrame {
     
     private final AlbumSave albumSave;
     private final AlbumView albumView;
-
+    private javax.swing.JFrame telaAnterior;
+    
+    public void abrirTela(javax.swing.JFrame telaAnterior) {
+    this.telaAnterior = telaAnterior;
+        if (this.telaAnterior != null) {
+            this.telaAnterior.setVisible(false);
+        }
+        this.setLocationRelativeTo(null);
+        this.setVisible(true);
+    }
+    
     @Autowired
     public AlbumOptions(AlbumSave albumSave, AlbumView albumView) {
         this.albumSave = albumSave;
@@ -110,20 +120,22 @@ public class AlbumOptions extends javax.swing.JFrame {
 
     private void btnVoltarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVoltarActionPerformed
         this.dispose();
+        if (this.telaAnterior != null) {
+            this.telaAnterior.setVisible(true); // Reexibe a janela pai ao voltar
+        }
     }//GEN-LAST:event_btnVoltarActionPerformed
 
     private void btnCadastrarAlbumActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCadastrarAlbumActionPerformed
        try {
-        albumSave.setVisible(true);
-        this.dispose();
-    } catch (Exception e) {
-        e.printStackTrace(); // <--- ISSO VAI MOSTRAR O ERRO REAL NO OUTPUT DO NETBEANS
-        javax.swing.JOptionPane.showMessageDialog(this, "Erro ao abrir tela: " + e.getMessage());
-    }
+        albumSave.abrirTela(this); 
+        } catch (Exception e) {
+            e.printStackTrace(); // <--- ISSO VAI MOSTRAR O ERRO REAL NO OUTPUT DO NETBEANS
+            javax.swing.JOptionPane.showMessageDialog(this, "Erro ao abrir tela: " + e.getMessage());
+        }
     }//GEN-LAST:event_btnCadastrarAlbumActionPerformed
 
     private void btnGerenciarAlbunsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGerenciarAlbunsActionPerformed
-        albumView.setVisible(true);
+        albumView.abrirTela(this); 
     }//GEN-LAST:event_btnGerenciarAlbunsActionPerformed
 
     /**

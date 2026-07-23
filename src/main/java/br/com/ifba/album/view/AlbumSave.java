@@ -369,6 +369,11 @@ public class AlbumSave extends javax.swing.JFrame {
                 javax.swing.JOptionPane.INFORMATION_MESSAGE);
         
         limparCampos();
+       
+        this.dispose();
+        if (this.telaAnterior != null) {
+            this.telaAnterior.setVisible(true); // Reexibe a janela pai ao voltar
+        }
         
     } catch (Exception e) {
         javax.swing.JOptionPane.showMessageDialog(this, 

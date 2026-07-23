@@ -17,7 +17,17 @@ public class MusicaOptions extends javax.swing.JFrame {
     
     private final MusicaSave musicaSave;
     private final MusicaView musicaView;
-
+    private javax.swing.JFrame telaAnterior;
+    
+    public void abrirTela(javax.swing.JFrame telaAnterior) {
+    this.telaAnterior = telaAnterior;
+        if (this.telaAnterior != null) {
+            this.telaAnterior.setVisible(false);
+        }
+        this.setLocationRelativeTo(null);
+        this.setVisible(true);
+    }
+    
     @Autowired
     public MusicaOptions(MusicaSave musicaSave, MusicaView musicaView) {
         this.musicaSave = musicaSave;
@@ -103,6 +113,9 @@ public class MusicaOptions extends javax.swing.JFrame {
 
     private void btnVoltarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVoltarActionPerformed
         this.dispose();
+        if (this.telaAnterior != null) {
+            this.telaAnterior.setVisible(true); // Faz a tela pai/menu reaparecer ao voltar
+        }
     }//GEN-LAST:event_btnVoltarActionPerformed
 
     private void btnGerenciarMusicasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGerenciarMusicasActionPerformed

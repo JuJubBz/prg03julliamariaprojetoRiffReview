@@ -22,6 +22,7 @@ import br.com.ifba.musica.view.MusicaSave;
 import br.com.ifba.musica.view.MusicaView;
 import br.com.ifba.usuario.entity.Usuario;
 import java.awt.event.ActionEvent;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -58,6 +59,8 @@ public class AvaliacaoViewAdm extends javax.swing.JFrame {
     private String contextoAtual = ""; 
     private Usuario usuarioLogado = null;
     
+    
+    @Autowired
     public AvaliacaoViewAdm(AvaliacaoSave avaliacaoSave,
             BandaSave bandaSave, BandaView bandaView, BandaOptions bandaOptions,
             AlbumSave albumSave, AlbumView albumView, AlbumOptions albumOptions,
@@ -460,17 +463,21 @@ public class AvaliacaoViewAdm extends javax.swing.JFrame {
 
     private void btnEngrenagemBandaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEngrenagemBandaActionPerformed
         this.contextoAtual = "BANDA";
-        bandaOptions.setVisible(true); // Abre a tela de opções de Banda;
+        bandaOptions.abrirTela(this);    
+    //bandaOptions.setVisible(true); // Abre a tela de opções de Banda;
     }//GEN-LAST:event_btnEngrenagemBandaActionPerformed
 
     private void btnEngrenagemAlbumActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEngrenagemAlbumActionPerformed
         this.contextoAtual = "ALBUM";
-        albumOptions.setVisible(true); // Abre a tela de opções de Álbum
+        albumOptions.abrirTela(this);
+    //albumOptions.setVisible(true); // Abre a tela de opções de Álbum
+    
     }//GEN-LAST:event_btnEngrenagemAlbumActionPerformed
 
     private void btnEngrenagemMusicaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEngrenagemMusicaActionPerformed
         this.contextoAtual = "MUSICA";
-        musicaOptions.setVisible(true); // Abre a tela de opções de Música
+        musicaOptions.abrirTela(this);
+        //musicaOptions.setVisible(true); // Abre a tela de opções de Música
     }//GEN-LAST:event_btnEngrenagemMusicaActionPerformed
 
     private void btnAvaliarAlbumActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAvaliarAlbumActionPerformed

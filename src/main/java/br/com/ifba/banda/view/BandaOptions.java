@@ -17,7 +17,17 @@ public class BandaOptions extends javax.swing.JFrame {
     
     private final BandaSave bandaSave;
     private final BandaView bandaView;
-
+    private javax.swing.JFrame telaAnterior;
+    
+    public void abrirTela(javax.swing.JFrame telaAnterior) {
+    this.telaAnterior = telaAnterior;
+        if (this.telaAnterior != null) {
+            this.telaAnterior.setVisible(false);
+        }
+        this.setLocationRelativeTo(null);
+        this.setVisible(true);
+    }
+    
     @Autowired
     public BandaOptions(BandaSave bandaSave, BandaView bandaView) {
         this.bandaSave = bandaSave;
@@ -103,14 +113,17 @@ public class BandaOptions extends javax.swing.JFrame {
 
     private void btnVoltarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVoltarActionPerformed
         this.dispose();
+        if (this.telaAnterior != null) {
+            this.telaAnterior.setVisible(true); // Reexibe a janela pai ao voltar
+        }
     }//GEN-LAST:event_btnVoltarActionPerformed
 
     private void btnCadastrarBandaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCadastrarBandaActionPerformed
-        bandaSave.setVisible(true);
+        bandaSave.abrirTela(this);
     }//GEN-LAST:event_btnCadastrarBandaActionPerformed
 
     private void btnGerenciarBandasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGerenciarBandasActionPerformed
-        bandaView.setVisible(true);
+        bandaView.abrirTela(this);
     }//GEN-LAST:event_btnGerenciarBandasActionPerformed
 
     /**
