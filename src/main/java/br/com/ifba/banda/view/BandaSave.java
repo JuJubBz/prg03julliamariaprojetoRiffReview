@@ -19,6 +19,7 @@ public class BandaSave extends javax.swing.JFrame {
     // TROCAMOS AQUI: Agora usamos o tipo da INTERFACE
     private final BandaIController bandaController;
     private Banda bandaEmEdicao = null; // Guarda a instância caso seja uma edição
+    private javax.swing.JFrame telaAnterior;
     /**
      * Creates new form BandaSave
      */
@@ -32,6 +33,15 @@ public class BandaSave extends javax.swing.JFrame {
         spnAnoFormacao.setEditor(new javax.swing.JSpinner.NumberEditor(spnAnoFormacao, "#"));
     }
 
+    public void abrirTela(javax.swing.JFrame telaAnterior) {
+        this.telaAnterior = telaAnterior;
+        if (this.telaAnterior != null) {
+         this.telaAnterior.setVisible(false); // Esconde a janela anterior
+        }
+        this.setLocationRelativeTo(null);
+        this.setVisible(true);
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -208,6 +218,9 @@ public class BandaSave extends javax.swing.JFrame {
 
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
         this.dispose();
+        if (this.telaAnterior != null) {
+            this.telaAnterior.setVisible(true); // Reexibe a janela pai ao voltar
+        }
     }//GEN-LAST:event_btnCancelarActionPerformed
 
     private void limparCampos() {

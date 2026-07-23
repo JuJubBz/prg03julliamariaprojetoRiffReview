@@ -18,6 +18,18 @@ public class MusicaSave extends javax.swing.JFrame {
     
     private final MusicaIController musicaController;
     private Musica musicaEmEdicao; // Guarda a instância caso seja uma edição
+    private Runnable aoSalvar;
+    private javax.swing.JFrame telaAnterior;
+    
+    
+    public void abrirTela(javax.swing.JFrame telaAnterior) {
+    this.telaAnterior = telaAnterior;
+    if (this.telaAnterior != null) {
+        this.telaAnterior.setVisible(false); // Esconde a janela anterior
+    }
+    this.setLocationRelativeTo(null);
+    this.setVisible(true);
+}
     /**
      * Creates new form AlbumSave
      */
@@ -28,6 +40,10 @@ public class MusicaSave extends javax.swing.JFrame {
         spnDuracao.setEditor(new javax.swing.JSpinner.NumberEditor(spnDuracao, "#"));
     }
 
+    public void setAoSalvar(Runnable aoSalvar) {
+    this.aoSalvar = aoSalvar;
+    }
+    
     public void prepararEdicao(Musica musica) {
         this.musicaEmEdicao = musica;
         
@@ -67,7 +83,7 @@ public class MusicaSave extends javax.swing.JFrame {
         txtNome = new javax.swing.JTextField();
         spnDuracao = new javax.swing.JSpinner();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         btnCancelar.setBackground(new java.awt.Color(255, 153, 153));
         btnCancelar.setText("CANCELAR");
@@ -147,7 +163,61 @@ public class MusicaSave extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnSalvarMusicaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarMusicaActionPerformed
-       try {
+       
+        try {
+        // 1. Validação dos campos
+        if (txtNome.getText().trim().isEmpty() || txtGenero.getText().trim().isEmpty()) {
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                    "Por favor, preencha o Nome e o Gênero antes de salvar.", 
+                    "Aviso", 
+                    javax.swing.JOptionPane.WARNING_MESSAGE);
+            return; 
+        }
+
+        // 2. Determinar objeto
+        Musica musicaParaSalvar = (this.musicaEmEdicao == null) ? new Musica() : this.musicaEmEdicao;
+        
+        musicaParaSalvar.setTitulo(txtNome.getText().trim());
+        musicaParaSalvar.setGeneroPrincipal(txtGenero.getText().trim());
+        musicaParaSalvar.setDuracao(String.valueOf(spnDuracao.getValue()));
+        
+        // 3. PERSISTÊNCIA CORRIGIDA (Chama save ou update baseado no estado)
+        if (this.musicaEmEdicao == null) {
+            this.musicaController.save(musicaParaSalvar);
+        } else {
+            this.musicaController.update(musicaParaSalvar); // Resolve o erro da imagem!
+        }
+        
+        // 4. Feedback e Callback
+        String acaoCompleta = (this.musicaEmEdicao == null) ? "salva" : "atualizada";
+        javax.swing.JOptionPane.showMessageDialog(this, 
+                "Música '" + musicaParaSalvar.getTitulo() + "' " + acaoCompleta + " com sucesso!", 
+                "Sucesso", 
+                javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        
+        // Atualiza a tabela dinamicamente na tela pai
+        if (this.aoSalvar != null) {
+            this.aoSalvar.run(); 
+        }
+        
+        // 5. Encerramento / Limpeza
+        if (this.musicaEmEdicao != null) {
+            this.dispose();
+            if (this.telaAnterior != null) {
+                this.telaAnterior.setVisible(true); // Restaura a tela da tabela
+            }
+        } else {
+            limparCampos();
+        }
+        
+    } catch (Exception e) {
+        javax.swing.JOptionPane.showMessageDialog(this, 
+                "Erro ao salvar a música: " + e.getMessage(), 
+                "Erro no Sistema", 
+                javax.swing.JOptionPane.ERROR_MESSAGE);
+    }
+        
+        /*try {
             // 1. Validar se os campos obrigatórios não foram deixados em branco
             if (txtNome.getText().trim().isEmpty() || txtGenero.getText().trim().isEmpty()) {
                 javax.swing.JOptionPane.showMessageDialog(this, 
@@ -182,6 +252,10 @@ public class MusicaSave extends javax.swing.JFrame {
                     "Sucesso", 
                     javax.swing.JOptionPane.INFORMATION_MESSAGE);
             
+            if (this.aoSalvar != null) {
+            this.aoSalvar.run(); // Aciona o recarregamento da tabela!
+            }
+            
             // 5. Se for edição, fecha a janela para voltar à tabela. Se for cadastro, limpa a tela para a próxima.
             if (this.musicaEmEdicao != null) {
                 this.dispose(); 
@@ -194,11 +268,14 @@ public class MusicaSave extends javax.swing.JFrame {
                     "Erro ao salvar a música: " + e.getMessage(), 
                     "Erro no Sistema", 
                     javax.swing.JOptionPane.ERROR_MESSAGE);
-        }
+        }*/
     }//GEN-LAST:event_btnSalvarMusicaActionPerformed
 
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
         this.dispose();
+        if (this.telaAnterior != null) {
+            this.telaAnterior.setVisible(true); // Reexibe a janela pai ao voltar
+        }
     }//GEN-LAST:event_btnCancelarActionPerformed
 
     private void limparCampos() {

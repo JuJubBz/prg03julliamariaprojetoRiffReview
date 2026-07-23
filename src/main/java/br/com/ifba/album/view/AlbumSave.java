@@ -25,6 +25,8 @@ public class AlbumSave extends javax.swing.JFrame {
     private final AlbumIController albumController;
     private final BandaIController bandaController;
     private final MusicaIController musicaController;
+    private javax.swing.JFrame telaAnterior;
+    
     
     // Atributo para controlar se a tela está em modo de edição ou inserção
     private Album albumEmEdicao = null;
@@ -50,6 +52,15 @@ public class AlbumSave extends javax.swing.JFrame {
         carregarBandas();
     }
 
+    public void abrirTela(javax.swing.JFrame telaAnterior) {
+        this.telaAnterior = telaAnterior;
+        if (this.telaAnterior != null) {
+            this.telaAnterior.setVisible(false); // Esconde a janela anterior
+            }
+        this.setLocationRelativeTo(null);
+        this.setVisible(true);
+    }
+    
     public void prepararEdicao(Album album) {
     this.preencherCampos(album);
     }
@@ -134,7 +145,7 @@ public class AlbumSave extends javax.swing.JFrame {
         btnCancelar = new javax.swing.JButton();
         btnSalvarAlbum = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         btnRemoverMusica.setBackground(new java.awt.Color(255, 153, 153));
         btnRemoverMusica.setText("REMOVER MUSICA");
@@ -316,6 +327,9 @@ public class AlbumSave extends javax.swing.JFrame {
 
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
         this.dispose();
+        if (this.telaAnterior != null) {
+            this.telaAnterior.setVisible(true); // Reexibe a janela pai ao voltar
+        }
     }//GEN-LAST:event_btnCancelarActionPerformed
 
     private void btnSalvarAlbumActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarAlbumActionPerformed

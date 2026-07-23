@@ -34,6 +34,7 @@ public class MusicaView extends javax.swing.JFrame {
     private final MusicaIController musicaController;
     private final DefaultTableModel tableModel;
     private final MusicaSave musicaSave;
+    private javax.swing.JFrame telaAnterior;
     
     /**
      * Creates new form MusicaView
@@ -45,6 +46,8 @@ public class MusicaView extends javax.swing.JFrame {
         this.bandaController = bandaController;
         this.musicaController = musicaController;
         this.musicaSave = musicaSave;
+        
+        
         
         initComponents();
         
@@ -59,6 +62,15 @@ public class MusicaView extends javax.swing.JFrame {
         
     }
 
+    public void abrirTela(javax.swing.JFrame telaAnterior) {
+        this.telaAnterior = telaAnterior;
+        if (this.telaAnterior != null) {
+         this.telaAnterior.setVisible(false); // Esconde a janela anterior
+        }
+        this.setLocationRelativeTo(null);
+        this.setVisible(true);
+    }
+    
     private void carregarMusicas() {
         try {
             tableModel.setRowCount(0); // Limpa registros antigos
@@ -139,6 +151,7 @@ public class MusicaView extends javax.swing.JFrame {
             if (musicaParaEditar != null) {
                 // 2. Prepara e exibe a tela de cadastro gerenciada pelo Spring
                 this.musicaSave.prepararEdicao(musicaParaEditar);
+                this.musicaSave.setAoSalvar(() -> carregarMusicas());
                 this.musicaSave.setVisible(true);
                 this.dispose(); // Fecha a tela de listagem
             } else {
@@ -220,6 +233,9 @@ public class MusicaView extends javax.swing.JFrame {
 
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
         this.dispose();
+        if (this.telaAnterior != null) {
+            this.telaAnterior.setVisible(true); // Reexibe a janela pai ao voltar
+        }
     }//GEN-LAST:event_btnCancelarActionPerformed
 
     /**

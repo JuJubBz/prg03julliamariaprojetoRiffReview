@@ -41,11 +41,15 @@ public class MusicaService implements MusicaIService{
         }
         
         // Validação 2: Se já tem ID, é uma edição e não deve ser salvo via save()
-        if (musica.getId() != 0) {
+        /*if (musica.getId() != 0) {
             log.warn("Tentativa de cadastrar música que já possui ID={}", musica.getId());
             throw new RuntimeException("Música já existente no Banco de dados! Utilize o método de atualização.");
-        }
+        }*/
         
+        if (musica.getId() != 0 && musica.getId() > 0) {
+        log.warn("Tentativa de cadastrar música que já possui ID={}", musica.getId());
+        throw new RuntimeException("Música já existente no Banco de dados! Utilize o método de atualização.");
+}
         // Validação 3: Validação de campos obrigatórios
         if (musica.getTitulo() == null || musica.getTitulo().trim().isEmpty()) {
             log.warn("Tentativa de cadastrar música sem título.");
@@ -72,7 +76,7 @@ public class MusicaService implements MusicaIService{
         }
         
         // Validação para garantir que o registro já existe antes de tentar atualizar
-        if (musica.getId() == 0 || !musicaRepository.existsById(musica.getId())) {
+        if (musica.getId() == 0 || musica.getId() <= 0 || !musicaRepository.existsById(musica.getId())) {
             log.error("Música não encontrada para atualização. ID={}", musica.getId());
             throw new RuntimeException("Música não encontrada para atualização!");
         }

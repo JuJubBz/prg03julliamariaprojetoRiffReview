@@ -20,6 +20,8 @@ public class UsuarioView extends javax.swing.JFrame {
     
    private final UsuarioIController usuarioController;
    private final UsuarioSave usuarioSave;
+   
+   
     /**
      * Creates new form UsuarioView
      */
@@ -33,6 +35,7 @@ public class UsuarioView extends javax.swing.JFrame {
         this.usuarioSave = usuarioSave;
         this.avaliacaoView = avaliacaoView;
         this.avaliacaoViewAdmin = avaliacaoViewAdmin;
+        
         initComponents();
     }
 

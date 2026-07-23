@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service 
-@org.springframework.transaction.annotation.Transactional(readOnly = true)
+@org.springframework.transaction.annotation.Transactional
 public class BandaService implements BandaIService{
 
    @Autowired

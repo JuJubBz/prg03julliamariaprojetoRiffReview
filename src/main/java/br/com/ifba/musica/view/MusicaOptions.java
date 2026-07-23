@@ -106,11 +106,11 @@ public class MusicaOptions extends javax.swing.JFrame {
     }//GEN-LAST:event_btnVoltarActionPerformed
 
     private void btnGerenciarMusicasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGerenciarMusicasActionPerformed
-        musicaView.setVisible(true);
+        musicaView.abrirTela(this);
     }//GEN-LAST:event_btnGerenciarMusicasActionPerformed
 
     private void btnCadastrarMusicaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCadastrarMusicaActionPerformed
-        musicaSave.setVisible(true);
+        musicaSave.abrirTela(this);
     }//GEN-LAST:event_btnCadastrarMusicaActionPerformed
 
     /**

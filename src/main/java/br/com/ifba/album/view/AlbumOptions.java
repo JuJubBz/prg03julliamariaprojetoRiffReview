@@ -21,6 +21,15 @@ public class AlbumOptions extends javax.swing.JFrame {
     public AlbumOptions(AlbumSave albumSave, AlbumView albumView) {
         this.albumSave = albumSave;
         this.albumView = albumView;
+        
+        this.setSize(600, 450);
+    
+    // 2. Trava para o usuário não esticar a tela
+        this.setResizable(false);
+    
+    // 3. Centraliza automaticamente no meio do monitor do usuário!
+        this.setLocationRelativeTo(null);
+        
         initComponents();
     }
     /**
