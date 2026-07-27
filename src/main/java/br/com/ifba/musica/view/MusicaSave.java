@@ -38,6 +38,8 @@ public class MusicaSave extends javax.swing.JFrame {
         initComponents();
         
         spnDuracao.setEditor(new javax.swing.JSpinner.NumberEditor(spnDuracao, "#"));
+        spnDuracao.setModel(new javax.swing.SpinnerNumberModel(0.0, 0.0, 999.9, 0.1));
+        spnDuracao.setEditor(new javax.swing.JSpinner.NumberEditor(spnDuracao, "0.00"));
     }
 
     public void setAoSalvar(Runnable aoSalvar) {
@@ -56,11 +58,13 @@ public class MusicaSave extends javax.swing.JFrame {
         txtGenero.setText(musica.getGeneroPrincipal());
         
         try {
-            if (musica.getDuracao() != null) {
-                spnDuracao.setValue(Integer.valueOf(musica.getDuracao()));
+            if (musica.getDuracao() != null && !musica.getDuracao().isEmpty()) {
+                // Converte a string da duração para Double garantindo leitura correta de pontos/vírgulas
+                double duracaoDouble = Double.parseDouble(musica.getDuracao().replace(",", "."));
+                spnDuracao.setValue(duracaoDouble);
             }
         } catch (NumberFormatException e) {
-            spnDuracao.setValue(0);
+            spnDuracao.setValue(0.0);
         }
     }
     
@@ -165,62 +169,61 @@ public class MusicaSave extends javax.swing.JFrame {
     private void btnSalvarMusicaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarMusicaActionPerformed
        
         try {
-        // 1. Validação dos campos
-        if (txtNome.getText().trim().isEmpty() || txtGenero.getText().trim().isEmpty()) {
-            javax.swing.JOptionPane.showMessageDialog(this, 
-                    "Por favor, preencha o Nome e o Gênero antes de salvar.", 
-                    "Aviso", 
-                    javax.swing.JOptionPane.WARNING_MESSAGE);
-            return; 
-        }
+            // 1. Validação dos campos obrigatórios
+            if (txtNome.getText().trim().isEmpty() || txtGenero.getText().trim().isEmpty()) {
+                javax.swing.JOptionPane.showMessageDialog(this, 
+                        "Por favor, preencha o Nome e o Gênero antes de salvar.", 
+                        "Aviso", 
+                        javax.swing.JOptionPane.WARNING_MESSAGE);
+                return; 
+            }
 
-        // 2. Determinar objeto
-        Musica musicaParaSalvar = (this.musicaEmEdicao == null) ? new Musica() : this.musicaEmEdicao;
-        
-        musicaParaSalvar.setTitulo(txtNome.getText().trim());
-        musicaParaSalvar.setGeneroPrincipal(txtGenero.getText().trim());
-        musicaParaSalvar.setDuracao(String.valueOf(spnDuracao.getValue()));
-        
-        // 3. PERSISTÊNCIA CORRIGIDA (Chama save ou update baseado no estado)
-        if (this.musicaEmEdicao == null) {
-            this.musicaController.save(musicaParaSalvar);
-        } else {
-            this.musicaController.update(musicaParaSalvar); // Resolve o erro da imagem!
-        }
-        
-        // 4. Feedback e Callback
-        String acaoCompleta = (this.musicaEmEdicao == null) ? "salva" : "atualizada";
-        javax.swing.JOptionPane.showMessageDialog(this, 
-                "Música '" + musicaParaSalvar.getTitulo() + "' " + acaoCompleta + " com sucesso!", 
-                "Sucesso", 
-                javax.swing.JOptionPane.INFORMATION_MESSAGE);
-        
-        // Atualiza a tabela dinamicamente na tela pai
-        if (this.aoSalvar != null) {
-            this.aoSalvar.run(); 
-        }
-        
-        // 5. Encerramento / Limpeza
-        if (this.musicaEmEdicao != null) {
+            // 2. Validação do tempo decimal e anti-negativos
+            double duracaoVal = Double.parseDouble(String.valueOf(spnDuracao.getValue()).replace(",", "."));
+            if (duracaoVal < 0) {
+                javax.swing.JOptionPane.showMessageDialog(this, 
+                        "O tempo da música não pode ser negativo!", 
+                        "Aviso", 
+                        javax.swing.JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            // 3. Determinar objeto
+            Musica musicaParaSalvar = (this.musicaEmEdicao == null) ? new Musica() : this.musicaEmEdicao;
+            
+            musicaParaSalvar.setTitulo(txtNome.getText().trim());
+            musicaParaSalvar.setGeneroPrincipal(txtGenero.getText().trim());
+            musicaParaSalvar.setDuracao(String.valueOf(duracaoVal)); // Salva o valor decimal na String
+            
+            // 4. Persistência
+            if (this.musicaEmEdicao == null) {
+                this.musicaController.save(musicaParaSalvar);
+            } else {
+                this.musicaController.update(musicaParaSalvar);
+            }
+            
+            // 5. Feedback e Callback
+            String acaoCompleta = (this.musicaEmEdicao == null) ? "salva" : "atualizada";
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                    "Música '" + musicaParaSalvar.getTitulo() + "' " + acaoCompleta + " com sucesso!", 
+                    "Sucesso", 
+                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
+            
+            if (this.aoSalvar != null) {
+                this.aoSalvar.run(); 
+            }
+            
             this.dispose();
             if (this.telaAnterior != null) {
-                this.telaAnterior.setVisible(true); // Restaura a tela da tabela
+                this.telaAnterior.setVisible(true); 
             }
-        } else {
-            limparCampos();
+            
+        } catch (Exception e) {
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                    "Erro ao salvar a música: " + e.getMessage(), 
+                    "Erro no Sistema", 
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
         }
-        
-        this.dispose();
-        if (this.telaAnterior != null) {
-            this.telaAnterior.setVisible(true); // Reexibe a janela pai ao voltar
-        }
-        
-    } catch (Exception e) {
-        javax.swing.JOptionPane.showMessageDialog(this, 
-                "Erro ao salvar a música: " + e.getMessage(), 
-                "Erro no Sistema", 
-                javax.swing.JOptionPane.ERROR_MESSAGE);
-    }
         
         /*try {
             // 1. Validar se os campos obrigatórios não foram deixados em branco

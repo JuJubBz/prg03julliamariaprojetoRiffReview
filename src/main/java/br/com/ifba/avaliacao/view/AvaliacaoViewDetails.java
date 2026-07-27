@@ -52,7 +52,7 @@ public class AvaliacaoViewDetails extends javax.swing.JFrame {
     }
     
     public void carregarDetalhes(Long itemId, String nomeItem, String tipoItem, List<Avaliacao> avaliacoes) {
-        lblItemSelecionado.setText(nomeItem);
+        /*lblItemSelecionado.setText(nomeItem);
         
         double media = 0.0;
         
@@ -94,7 +94,120 @@ public class AvaliacaoViewDetails extends javax.swing.JFrame {
                     av.getComentario()
                 });
             }
+        }*/
+        
+        lblItemSelecionado.setText(nomeItem);
+        
+        double media = 0.0;
+        
+        try {
+            if (tipoItem != null) {
+                switch (tipoItem.toUpperCase()) {
+                    case "BANDA":
+                        media = bandaController.calcularMediaAvaliacoes(itemId);
+                        break;
+                    case "ALBUM":
+                    case "ÁLBUM":
+                        media = albumController.calcularMediaNotas(itemId);
+                        break;
+                    case "MUSICA":
+                    case "MÚSICA":
+                        media = musicaController.calcularMediaNotas(itemId);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            lblMediaGeral.setText(String.format("%.1f", media));
+        } catch (RuntimeException e) {
+            lblMediaGeral.setText("N/A");
+            JOptionPane.showMessageDialog(this, 
+                "Erro ao calcular a média: " + e.getMessage(), 
+                "Erro", 
+                JOptionPane.ERROR_MESSAGE);
         }
+
+        try {
+            // Usa diretamente a variável da tabela gerada pelo NetBeans
+            javax.swing.table.DefaultTableModel tableModel = 
+                    (javax.swing.table.DefaultTableModel) tblResultados.getModel();
+            
+            tableModel.setRowCount(0); // Limpa as linhas anteriores
+/*
+            if (avaliacoes != null) {
+                for (Avaliacao av : avaliacoes) {
+                    
+                    // Identifica de qual tipo é a avaliação para pegar o autor/usuário se quiser, 
+                    // ou mantemos apenas Nota e Avaliação Escrita conforme as colunas da sua tabela.
+                    // Aqui pegamos o nome do usuário que fez a avaliação (caso sua entidade tenha getUsuario())
+                    String nomeUsuario = "";
+                    if (av.getUsuario() != null) {
+                        nomeUsuario = av.getUsuario().getNome();
+                    }
+                    
+                    // Converte o comentário em HTML para forçar a quebra de linha automática
+                    String comentarioFormatado = "<html><body style='width: 300px;'>" + av.getComentario() + "</body></html>";
+                    
+                    tableModel.addRow(new Object[]{
+                        av.getNota(),          // Coluna 0: Nota
+                        comentarioFormatado    // Coluna 1: Avaliação Escrita
+                    });
+                }
+                
+                if (tblResultados.getColumnCount() >= 2) {
+                    tblResultados.getColumnModel().getColumn(1).setPreferredWidth(350);
+                }
+                
+                // Força cada linha a se ajustar dinamicamente à altura do conteúdo HTML interno
+                for (int row = 0; row < tblResultados.getRowCount(); row++) {
+                    int rowHeight = tblResultados.getRowHeight();
+                    for (int column = 0; column < tblResultados.getColumnCount(); column++) {
+                        java.awt.Component comp = tblResultados.prepareRenderer(tblResultados.getCellRenderer(row, column), row, column);
+                        rowHeight = Math.max(rowHeight, comp.getPreferredSize().height);
+                    }
+                    tblResultados.setRowHeight(row, rowHeight);
+                }
+            }*/
+
+
+            for (Avaliacao av : avaliacoes) {
+                    
+                    // Pega o nome do usuário de forma segura
+                    String nomeUsuario = "Desconhecido";
+                    if (av.getUsuario() != null) {
+                        nomeUsuario = av.getUsuario().getNome();
+                    }
+                    
+                    // Converte o comentário em HTML para forçar a quebra de linha automática
+                    String comentarioFormatado = "<html><body style='width: 250px;'>" + av.getComentario() + "</body></html>";
+                    
+                    tableModel.addRow(new Object[]{
+                        nomeUsuario,           // Coluna 0: Usuário
+                        av.getNota(),          // Coluna 1: Nota
+                        comentarioFormatado    // Coluna 2: Avaliação Escrita
+                    });
+                }
+                
+                // Ajusta a largura da coluna de comentário (agora é a coluna 2)
+                if (tblResultados.getColumnCount() >= 3) {
+                    tblResultados.getColumnModel().getColumn(2).setPreferredWidth(300);
+                }
+                
+                // Força cada linha a se ajustar dinamicamente à altura do conteúdo HTML interno
+                for (int row = 0; row < tblResultados.getRowCount(); row++) {
+                    int rowHeight = tblResultados.getRowHeight();
+                    for (int column = 0; column < tblResultados.getColumnCount(); column++) {
+                        java.awt.Component comp = tblResultados.prepareRenderer(tblResultados.getCellRenderer(row, column), row, column);
+                        rowHeight = Math.max(rowHeight, comp.getPreferredSize().height);
+                    }
+                    tblResultados.setRowHeight(row, rowHeight);
+                }
+            
+        } catch (Exception e) {
+            System.out.println("Erro ao carregar os detalhes das avaliações: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
     }
     
     public void inicializarTela(String nomeItem, String tipoItem) {
@@ -169,13 +282,13 @@ public class AvaliacaoViewDetails extends javax.swing.JFrame {
 
         tblResultados.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null}
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null}
             },
             new String [] {
-                "Nota", "Avaliação Escrita"
+                "Usuário", "Nota", "Avaliação Escrita"
             }
         ));
         jScrollPane1.setViewportView(tblResultados);

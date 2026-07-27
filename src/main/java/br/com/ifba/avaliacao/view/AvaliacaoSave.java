@@ -124,6 +124,8 @@ public class AvaliacaoSave extends javax.swing.JFrame {
         txtComentario.setWrapStyleWord(true);
         jScrollPane1.setViewportView(txtComentario);
 
+        spnNota.setModel(new javax.swing.SpinnerNumberModel(0.0, 0.0, 5.0, 0.5));
+
         cbxItemAvaliado.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         lblEscolha.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -155,12 +157,12 @@ public class AvaliacaoSave extends javax.swing.JFrame {
                                     .addComponent(btnCancelar))
                                 .addGroup(layout.createSequentialGroup()
                                     .addComponent(jLabel2)
-                                    .addGap(62, 62, 62)
-                                    .addComponent(spnNota, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGap(18, 18, 18)
+                                    .addComponent(spnNota, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(lblEscolha)
-                                    .addGap(56, 56, 56)
-                                    .addComponent(cbxItemAvaliado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                    .addComponent(cbxItemAvaliado, javax.swing.GroupLayout.PREFERRED_SIZE, 199, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 597, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                 .addContainerGap(87, Short.MAX_VALUE))
         );

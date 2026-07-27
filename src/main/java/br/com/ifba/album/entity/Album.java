@@ -43,7 +43,7 @@ public class Album extends PersistenceEntity implements Serializable{
     private Banda banda;
     
     @ToString.Exclude
-    @OneToMany(mappedBy = "album", fetch = jakarta.persistence.FetchType.EAGER) // <--- Mude para EAGER
+    @OneToMany(mappedBy = "album", cascade = jakarta.persistence.CascadeType.ALL, fetch = jakarta.persistence.FetchType.EAGER)
     private List<Musica> musicas;
     
     @ToString.Exclude
