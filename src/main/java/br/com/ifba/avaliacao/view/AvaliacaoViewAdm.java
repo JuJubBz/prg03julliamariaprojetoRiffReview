@@ -102,7 +102,11 @@ public class AvaliacaoViewAdm extends javax.swing.JFrame {
         }
     }
     
-    private void carregarAvaliacoesDoUsuario() {
+    public void atualizarTabela() {
+        carregarAvaliacoesDoUsuario();
+    }
+    
+    public void carregarAvaliacoesDoUsuario() {
         
         try {
             // Obtém a tabela de dentro do painel de rolagem

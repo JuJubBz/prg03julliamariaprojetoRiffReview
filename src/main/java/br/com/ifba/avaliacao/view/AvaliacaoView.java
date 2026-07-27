@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class AvaliacaoView extends javax.swing.JFrame {
     
-   private final AvaliacaoSave avaliacaoSave;
+    private final AvaliacaoSave avaliacaoSave;
     private final AvaliacaoViewSearch avaliacaoViewSearch;
     private final AvaliacaoIController avaliacaoController;
     
@@ -48,6 +48,11 @@ public class AvaliacaoView extends javax.swing.JFrame {
         initComponents();
     }
 
+    
+    public void atualizarTabela() {
+        carregarAvaliacoesDoUsuario();
+    }
+    
     public void inicializarTela(Usuario usuario) {
         if (usuario != null) {
         // ESSA LINHA É A MAIS IMPORTANTE: ela salva o usuário para os botões usarem depois
@@ -62,7 +67,7 @@ public class AvaliacaoView extends javax.swing.JFrame {
     carregarAvaliacoesDoUsuario();
     }
     
-    private void carregarAvaliacoesDoUsuario() {
+    public void carregarAvaliacoesDoUsuario() {
         
         try {
         // Use diretamente a variavel da tabela gerada pelo NetBeans

@@ -42,6 +42,9 @@ public class AlbumView extends javax.swing.JFrame {
         if (this.telaAnterior != null) {
             this.telaAnterior.setVisible(false);
         }
+        
+        carregarAlbuns();
+        
         this.setLocationRelativeTo(null);
         this.setVisible(true);
     }

@@ -283,7 +283,7 @@ public class MusicaSave extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnCancelarActionPerformed
 
-    private void limparCampos() {
+    public void limparCampos() {
         this.musicaEmEdicao = null; // Reseta o estado para modo cadastro
         jLabel1.setText("ADICIONAR MUSICA");
         btnSalvarMusica.setText("SALVAR MUSICA");

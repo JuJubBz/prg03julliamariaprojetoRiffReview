@@ -63,6 +63,9 @@ public class BandaView extends javax.swing.JFrame {
         if (this.telaAnterior != null) {
          this.telaAnterior.setVisible(false); // Esconde a janela anterior
         }
+        
+        carregarBandas();
+        
         this.setLocationRelativeTo(null);
         this.setVisible(true);
     }

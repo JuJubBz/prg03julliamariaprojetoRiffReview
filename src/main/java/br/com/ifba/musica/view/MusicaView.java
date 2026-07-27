@@ -67,6 +67,9 @@ public class MusicaView extends javax.swing.JFrame {
         if (this.telaAnterior != null) {
          this.telaAnterior.setVisible(false); // Esconde a janela anterior
         }
+        
+        carregarMusicas();
+        
         this.setLocationRelativeTo(null);
         this.setVisible(true);
     }
@@ -107,8 +110,8 @@ public class MusicaView extends javax.swing.JFrame {
     BotaoAcaoTabela acaoEditar = new BotaoAcaoTabela(tblMusicas, "✏️ Editar", new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            int linha = Integer.parseInt(e.getActionCommand()); // 👈 Pega a linha exata
-            executarEditar(linha); // 👈 Passa a linha tratada
+            int linha = Integer.parseInt(e.getActionCommand()); //  Pega a linha exata
+            executarEditar(linha); //  Passa a linha tratada
         }
     });
     tblMusicas.getColumnModel().getColumn(6).setCellRenderer((TableCellRenderer) acaoEditar);

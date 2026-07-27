@@ -119,7 +119,9 @@ public class AvaliacaoSave extends javax.swing.JFrame {
         jLabel3.setText("Comentário:");
 
         txtComentario.setColumns(20);
+        txtComentario.setLineWrap(true);
         txtComentario.setRows(5);
+        txtComentario.setWrapStyleWord(true);
         jScrollPane1.setViewportView(txtComentario);
 
         cbxItemAvaliado.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
@@ -234,11 +236,50 @@ public class AvaliacaoSave extends javax.swing.JFrame {
                 avaliacaoMusicaController.save(novaAvaliacao);
             }
 
-            JOptionPane.showMessageDialog(this, "Avaliação salva com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+            /*JOptionPane.showMessageDialog(this, "Avaliação salva com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
             this.dispose();
             if (this.telaAnterior != null) {
                 this.telaAnterior.setVisible(true); // Faz a tela pai/menu reaparecer ao voltar
-            }
+            }*/
+            
+            /*JOptionPane.showMessageDialog(
+            this,
+            "Avaliação salva com sucesso!",
+            "Sucesso",
+           JOptionPane.INFORMATION_MESSAGE
+        );
+
+        // Atualiza a tabela da tela principal
+        if (this.telaAnterior instanceof AvaliacaoView) {
+
+        AvaliacaoView tela = (AvaliacaoView) this.telaAnterior;
+
+        tela.carregarAvaliacoesDoUsuario();
+
+        tela.setVisible(true);   
+    }*/
+            
+            JOptionPane.showMessageDialog(
+            this,
+            "Avaliação salva com sucesso!",
+            "Sucesso",
+            JOptionPane.INFORMATION_MESSAGE
+        );
+
+            // Atualiza a tabela da tela anterior
+            if (this.telaAnterior instanceof AvaliacaoView) {
+
+                ((AvaliacaoView) this.telaAnterior).atualizarTabela();
+
+            } else if (this.telaAnterior instanceof AvaliacaoViewAdm) {
+
+            ((AvaliacaoViewAdm) this.telaAnterior).atualizarTabela();
+        }
+
+        this.dispose();
+        if (this.telaAnterior != null) {
+            this.telaAnterior.setVisible(true); // Faz a tela pai/menu reaparecer ao voltar
+        }
 
         } catch (Exception e) {
             System.err.println("Erro ao salvar a avaliação: " + e.getMessage());
